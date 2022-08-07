@@ -1,0 +1,36 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  """UserId"""
+  userId: Int!
+
+  """The name of the user"""
+  username: String!
+
+  """The hashed password of the user"""
+  password: String!
+}
+
+type Query {
+  users: [User!]!
+  user(id: Int!): User!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+}
+
+input CreateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateUserInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
