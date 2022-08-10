@@ -13,9 +13,24 @@ type User {
   password: String!
 }
 
+type LoginResult {
+  """Example field (placeholder)"""
+  access_token: String!
+}
+
 type Query {
+  login(loginUserInput: LoginUserInput!): LoginResult!
   users: [User!]!
   user(id: Int!): User!
+  whoAmI: User!
+}
+
+input LoginUserInput {
+  """Example field (placeholder)"""
+  username: String!
+
+  """Example field (placeholder)"""
+  password: String!
 }
 
 type Mutation {
