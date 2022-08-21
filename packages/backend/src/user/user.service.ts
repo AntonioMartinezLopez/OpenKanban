@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  private readonly users = [
+  private users: Array<User> = [
     {
       userId: 1,
       username: 'john',
       password: 'changeme',
+      email: '',
+      refreshToken: [],
     },
     {
       userId: 2,
       username: 'maria',
       password: 'guess',
+      email: '',
+      refreshToken: [],
     },
   ];
 
@@ -33,8 +38,17 @@ export class UserService {
     return this.users.find((user) => user.username === username);
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  update(id: number, updateUserInput: Record<any, any>): User | undefined {
+    let updatedUser;
+    this.users = this.users.map((user) => {
+      if (user.userId === id) {
+        updatedUser = { ...user, ...updateUserInput };
+        return { ...user, ...updateUserInput };
+      } else {
+        return user;
+      }
+    });
+    return updatedUser;
   }
 
   remove(id: number) {

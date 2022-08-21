@@ -14,7 +14,11 @@ import { UserModule } from './user/user.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       debug: true,
-      playground: true,
+      playground: { settings: { 'request.credentials': 'include' } },
+      context: ({ req, res }): { req: Request; res: Response } => {
+        return { req, res };
+      },
+      cors: { origin: true, credentials: true },
     }),
     AuthModule,
     UserModule,

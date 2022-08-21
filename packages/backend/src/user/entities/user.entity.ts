@@ -9,5 +9,9 @@ export class User {
   username: string;
 
   @Field({ description: 'The hashed password of the user' })
+  email: string;
+
   password: string;
+
+  refreshToken?: Array<string>;
 }

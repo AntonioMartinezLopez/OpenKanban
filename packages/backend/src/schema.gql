@@ -10,7 +10,7 @@ type User {
   username: String!
 
   """The hashed password of the user"""
-  password: String!
+  email: String!
 }
 
 type LoginResult {
@@ -20,6 +20,8 @@ type LoginResult {
 
 type Query {
   login(loginUserInput: LoginUserInput!): LoginResult!
+  logout: Boolean
+  refreshToken: LoginResult
   users: [User!]!
   user(id: Int!): User!
   whoAmI: User!
