@@ -8,6 +8,25 @@ services:
     volumes:
       - ./packages/backend:/var/app/backend
     ports:
-      - 8080:8080
+      - 3000:3000
     environment:
-      - EXPOSE_PORT=8080
+      EXPOSE_PORT: 3000
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: kanban
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: kanban
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

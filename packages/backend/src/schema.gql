@@ -9,7 +9,7 @@ type User {
   """The name of the user"""
   username: String!
 
-  """The hashed password of the user"""
+  """The email of the user"""
   email: String!
 }
 
@@ -42,12 +42,24 @@ type Mutation {
 }
 
 input CreateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Field for name of the new user"""
+  username: String!
+
+  """Field for the email address of the new suer"""
+  email: String!
+
+  """Field for the password of the new user"""
+  password: String!
 }
 
 input UpdateUserInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  """Field for name of the new user"""
+  username: String
+
+  """Field for the email address of the new suer"""
+  email: String
+
+  """Field for the password of the new user"""
+  password: String
   id: Int!
 }
