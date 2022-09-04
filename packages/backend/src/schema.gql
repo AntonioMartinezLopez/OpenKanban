@@ -4,7 +4,7 @@
 
 type User {
   """UserId"""
-  userId: Int!
+  userId: String!
 
   """The name of the user"""
   username: String!
@@ -23,7 +23,7 @@ type Query {
   logout: Boolean
   refreshToken: LoginResult
   users: [User!]!
-  user(id: Int!): User!
+  user(id: String!): User!
   whoAmI: User!
 }
 
@@ -36,9 +36,9 @@ input LoginUserInput {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
+  register(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
+  removeUser(id: String!): User!
 }
 
 input CreateUserInput {
@@ -54,12 +54,12 @@ input CreateUserInput {
 
 input UpdateUserInput {
   """Field for name of the new user"""
-  username: String
+  username: String!
 
-  """Field for the email address of the new suer"""
-  email: String
+  """Field for the email address of the new user"""
+  email: String!
 
   """Field for the password of the new user"""
-  password: String
-  id: Int!
+  password: String!
+  userId: String!
 }

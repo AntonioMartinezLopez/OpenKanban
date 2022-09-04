@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import Ctx from 'src/types/context.types';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { LoginResult } from './dto/login-result';
 import { LoginUserInput } from './dto/login-user.input';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
@@ -16,10 +18,15 @@ export class AuthService {
   async validateUser(username: string, pass: string): Promise<User | null> {
     const user = await this.userService.findOneByName(username);
 
-    // // evaluate password
-    // const match = await bcrypt.compare(pwd, foundUser.password);
-    if (user && user.password === pass) {
-      return user;
+    if (!user) {
+      return null;
+    } else {
+      // evaluate password
+      const match = await bcrypt.compare(pass, user.password);
+
+      if (match) {
+        return user;
+      }
     }
     return null;
   }
@@ -27,8 +34,6 @@ export class AuthService {
   async login(loginInput: LoginUserInput, context: Ctx): Promise<LoginResult> {
     // Check if a cookie was sent during login request
     const cookies = context.req.cookies;
-    if (cookies)
-      console.log(`cookie available at login: ${JSON.stringify(cookies)}`);
 
     const user = await this.validateUser(
       loginInput.username,
@@ -51,7 +56,7 @@ export class AuthService {
     );
 
     // load the refreshtoken array
-    let newRefreshTokenArray = !cookies?.jwt
+    const newRefreshTokenArray = !cookies?.jwt
       ? user.refreshToken
       : user.refreshToken.filter((rt) => rt !== cookies.jwt);
 
@@ -64,19 +69,34 @@ export class AuthService {
     */
     if (cookies.jwt) {
       const refreshToken = cookies.jwt;
-      const foundToken = await this.userService
-        .findAll()
-        .filter((user) => user.refreshToken.includes(refreshToken));
+      const foundUser = await this.userService.findUserByRefreshToken(
+        refreshToken,
+      );
+
+      this.logger.log(
+        'User ' + 'already logged in. Setting new refresh token: ',
+      );
+
+      // .findAll()
+      // .filter((user) => user.refreshToken.includes(refreshToken));
 
       // Detected refresh token reuse!
-      if (!foundToken) {
-        console.log('attempted refresh token reuse at login!');
+      if (!foundUser || foundUser.username !== user.username) {
+        this.logger.log('Attempted refresh token reuse at login!');
 
-        //*TODO*: delete all refreshtoken in affected users
+        //*TODO*: delete all refreshtoken in affected user
         // put code in here
+        const decodedJWT: any = this.jwtService.decode(refreshToken);
 
-        // clear out ALL previous refresh tokens
-        newRefreshTokenArray = [];
+        const compUser = await this.userService.findOneByName(
+          decodedJWT.username,
+        );
+        if (compUser) {
+          await this.userService.updateTokens({
+            userId: compUser.userId,
+            refreshToken: [],
+          });
+        }
       }
 
       context.res.clearCookie('jwt', {
@@ -87,10 +107,15 @@ export class AuthService {
     }
 
     // Saving refreshToken with current user
-    const result = this.userService.update(user.userId, {
+    const result = await this.userService.updateTokens({
+      userId: user.userId,
       refreshToken: [...newRefreshTokenArray, newRefreshToken],
     });
-    console.log(result);
+
+    this.logger.log(
+      'LOGIN:' +
+        JSON.stringify({ user: result.username, tokens: result.refreshToken }),
+    );
 
     // Creates Secure Cookie with refresh token
     context.res.cookie('jwt', newRefreshToken, {
@@ -105,16 +130,16 @@ export class AuthService {
     };
   }
 
-  async logout(context: Ctx): Promise<number | undefined> {
+  async logout(context: Ctx): Promise<string | undefined> {
     //load cookie
     const refreshToken = context.req.cookies.jwt;
     if (!refreshToken) {
       return null;
     }
 
-    const user = this.userService.findOneById(
-      parseInt(this.jwtService.decode(refreshToken)['userId']),
-    );
+    const extractedUserId = this.jwtService.decode(refreshToken)['userId'];
+
+    const user = await this.userService.findOneById(extractedUserId);
 
     //if no user found
     if (!user) {
@@ -131,11 +156,15 @@ export class AuthService {
       (token) => token !== refreshToken,
     );
 
-    const result = this.userService.update(user.userId, {
+    const result = await this.userService.updateTokens({
+      userId: user.userId,
       refreshToken: refreshTokenArray,
     });
 
-    console.log('LOGOUT!', result);
+    this.logger.log(
+      'LOGOUT:' +
+        JSON.stringify({ user: result.username, tokens: result.refreshToken }),
+    );
 
     //clear cookies
     context.res.clearCookie('jwt', {
@@ -161,40 +190,50 @@ export class AuthService {
     });
 
     //search for client that has the refresh token
-    const foundUser = this.userService
-      .findAll()
-      .find((user) => user.refreshToken.includes(refreshToken));
+    const foundUser = await this.userService.findUserByRefreshToken(
+      refreshToken,
+    );
+    // const foundUser = await this.userService
+    //   .findAll()
+    //   .find((user) => user.refreshToken.includes(refreshToken));
 
     // Detect refresh token reuse
     if (!foundUser) {
       this.jwtService
         .verifyAsync(refreshToken)
-        .then((decodedJWT) => {
-          console.log('Attempted refresh token reuse!');
-          const compUser = this.userService.findOneByName(decodedJWT.username);
+        .then(async (decodedJWT) => {
+          this.logger.log('Attempted refresh token reuse!');
+          const compUser = await this.userService.findOneByName(
+            decodedJWT.username,
+          );
           if (compUser) {
-            const result = this.userService.update(compUser.userId, {
+            await this.userService.updateTokens({
+              userId: compUser.userId,
               refreshToken: [],
             });
-            console.log(result);
           }
         })
         .catch((err) => {
-          console.log('ERROR: ', err);
-          return null;
+          this.logger.error('ERROR: ' + err);
+          //return null;
         });
       return null;
     }
 
-    const newRefreshTokenArray = foundUser.refreshToken.filter(
+    let newRefreshTokenArray = foundUser.refreshToken.filter(
       (rt) => rt !== refreshToken,
     );
 
     try {
       const decodedJwt = this.jwtService.verify(refreshToken);
 
-      //return 403 when username not euwal to username within jwt
-      if (foundUser.username !== decodedJwt.username) return null;
+      //return 403 when userid not equal to userid within jwt
+      //if (foundUser.userId !== decodedJwt.userId) return null;
+
+      //if username differs ( e.g. by changing it), make all existing refresh tokens invalid
+      if (foundUser.username !== decodedJwt.username) {
+        newRefreshTokenArray = [];
+      }
 
       //generate new access token
       const accessToken = this.jwtService.sign({
@@ -211,10 +250,18 @@ export class AuthService {
         { expiresIn: '1d' },
       );
 
-      const result = this.userService.update(foundUser.userId, {
+      const result = await this.userService.updateTokens({
+        userId: foundUser.userId,
         refreshToken: [...newRefreshTokenArray, newRefreshToken],
       });
-      console.log(result);
+
+      this.logger.log(
+        'REFRESH TOKEN:' +
+          JSON.stringify({
+            user: result.username,
+            tokens: result.refreshToken,
+          }),
+      );
 
       // set cookie
       context.res.cookie('jwt', newRefreshToken, {
@@ -227,12 +274,12 @@ export class AuthService {
       //return access token
       return { access_token: accessToken } as LoginResult;
     } catch (error) {
-      console.log(error, 'expired refresh token');
+      this.logger.error(error);
       foundUser.refreshToken = [...newRefreshTokenArray];
-      const result = this.userService.update(foundUser.userId, {
+      await this.userService.updateTokens({
+        userId: foundUser.userId,
         refreshToken: [...newRefreshTokenArray],
       });
-      console.log(result);
       return null;
     }
   }

@@ -1,71 +1,104 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
+import { UpdateUserInput, UpdateUserInputAuth } from './dto/update-user.input';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
-  private users: Array<User> = [
-    {
-      userId: 1,
-      username: 'john',
-      password: 'changeme',
-      email: '',
-      refreshToken: [],
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-      email: '',
-      refreshToken: [],
-    },
-  ];
 
+  // C for CREATE
   async create(createUserInput: CreateUserInput): Promise<User> {
-    //Create User Object
-    const newUser = new User();
-    newUser.username = createUserInput.username;
-    newUser.password = createUserInput.password;
-    newUser.email = createUserInput.email;
-
-    //Save new User
-    const savedUser = await this.usersRepository.save(newUser);
-    return savedUser;
-  }
-
-  findAll() {
-    return this.users;
-  }
-
-  findOneById(id: number) {
-    return this.users.find((user) => user.userId === id);
-  }
-
-  findOneByName(username: string) {
-    return this.users.find((user) => user.username === username);
-  }
-
-  update(id: number, updateUserInput: Record<any, any>): User | undefined {
-    let updatedUser;
-    this.users = this.users.map((user) => {
-      if (user.userId === id) {
-        updatedUser = { ...user, ...updateUserInput };
-        return { ...user, ...updateUserInput };
-      } else {
-        return user;
-      }
+    // check whether user already exists with given name. If so, abort creation of user
+    const existingUser = await this.usersRepository.findOneBy({
+      username: createUserInput.username,
     });
-    return updatedUser;
+    if (existingUser) throw new ForbiddenException('Username already exists!');
+
+    try {
+      //Create User Object
+      const newUser = new User();
+      newUser.username = createUserInput.username;
+      newUser.email = createUserInput.email;
+      newUser.refreshToken = [];
+
+      // hash and set password
+      newUser.password = await bcrypt.hash(createUserInput.password, 10);
+
+      //Save new user and return
+      return this.usersRepository.save(newUser);
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  // R for READ
+  async findAll(): Promise<Array<User>> {
+    return this.usersRepository.find();
+  }
+
+  async findOneById(id: string): Promise<User> {
+    return this.usersRepository.findOneBy({ userId: id });
+  }
+
+  async findOneByName(username: string): Promise<User> {
+    return this.usersRepository.findOneBy({ username: username });
+  }
+
+  async findUserByRefreshToken(refreshToken: string): Promise<User> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where(":refreshToken = ANY ( string_to_array(user.refreshToken, ','))", {
+        refreshToken: refreshToken,
+      })
+      .getOne();
+    // .where(":refreshToken = ANY ( string_to_array(user.refreshToken, ','))", { refreshToken: refreshToken })
+  }
+
+  // U for UPDATE
+  async update(updateUserInput: UpdateUserInput): Promise<User> {
+    try {
+      //hash password
+      updateUserInput.password = await bcrypt.hash(
+        updateUserInput.password,
+        10,
+      );
+
+      await this.usersRepository.update(
+        { userId: updateUserInput.userId },
+        { ...updateUserInput },
+      );
+
+      return this.usersRepository.findOneBy({ userId: updateUserInput.userId });
+    } catch (e) {
+      throw new ForbiddenException(e);
+    }
+  }
+
+  // internal function
+  async updateTokens(updateUserInput: UpdateUserInputAuth): Promise<User> {
+    await this.usersRepository.update(
+      { userId: updateUserInput.userId },
+      { ...updateUserInput },
+    );
+
+    return this.usersRepository.findOneBy({ userId: updateUserInput.userId });
+  }
+
+  // D for DELETE
+  async remove(id: string): Promise<User> {
+    const user = await this.findOneById(id);
+    if (user) {
+      this.usersRepository.remove(user);
+    }
+    throw new ForbiddenException('User id is unknown!');
   }
 }
