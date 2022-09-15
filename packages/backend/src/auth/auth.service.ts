@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { LoginResult } from './dto/login-result';
 import { LoginUserInput } from './dto/login-user.input';
 import * as bcrypt from 'bcryptjs';
+import { AuthenticationError } from 'apollo-server-express';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,9 @@ export class AuthService {
     );
 
     if (!user) {
-      return null;
+      throw new AuthenticationError(
+        'Could not log-in with the provided credentials',
+      );
     }
 
     // create JWT
@@ -179,7 +182,7 @@ export class AuthService {
     // load cookie from request
     const refreshToken = context.req.cookies.jwt;
     if (!refreshToken) {
-      return null;
+      throw new AuthenticationError('invalid or missing refresh token');
     }
 
     //delete cookie
@@ -217,7 +220,7 @@ export class AuthService {
           this.logger.error('ERROR: ' + err);
           //return null;
         });
-      return null;
+      throw new AuthenticationError('refresh token reuse detected');
     }
 
     let newRefreshTokenArray = foundUser.refreshToken.filter(
@@ -280,7 +283,7 @@ export class AuthService {
         userId: foundUser.userId,
         refreshToken: [...newRefreshTokenArray],
       });
-      return null;
+      throw new AuthenticationError('invalid refresh token');
     }
   }
 }

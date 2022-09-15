@@ -1,5 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Group } from 'src/groups/entities/group.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 @ObjectType()
@@ -21,4 +22,11 @@ export class User {
 
   @Column('simple-array')
   refreshToken?: string[];
+
+  @ManyToMany(() => Group, (group) => group.users, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  groups: Group[];
 }

@@ -9,6 +9,8 @@ import { join } from 'path';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
+import { GroupsModule } from './groups/groups.module';
+import { Group } from './groups/entities/group.entity';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { User } from './user/entities/user.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User],
+      entities: [User, Group],
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -34,6 +36,7 @@ import { User } from './user/entities/user.entity';
     }),
     AuthModule,
     UserModule,
+    GroupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

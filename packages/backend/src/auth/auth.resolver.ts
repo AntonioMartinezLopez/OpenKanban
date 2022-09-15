@@ -1,5 +1,4 @@
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
-import { AuthenticationError } from 'apollo-server-express';
 import Ctx from 'src/types/context.types';
 import { AuthService } from './auth.service';
 import { LoginResult } from './dto/login-result';
@@ -14,11 +13,7 @@ export class AuthResolver {
     @Args('loginUserInput') loginUserInput: LoginUserInput,
     @Context() context: Ctx,
   ): Promise<LoginResult> {
-    const result = await this.authService.login(loginUserInput, context);
-    if (result) return result;
-    throw new AuthenticationError(
-      'Could not log-in with the provided credentials',
-    );
+    return this.authService.login(loginUserInput, context);
   }
 
   @Query(() => Boolean, { nullable: true, name: 'logout' })
@@ -29,10 +24,6 @@ export class AuthResolver {
 
   @Query(() => LoginResult, { nullable: true, name: 'refreshToken' })
   async refreshToken(@Context() context: Ctx): Promise<LoginResult> {
-    const result = await this.authService.refreshToken(context);
-    if (result) {
-      return result; // return result ? true : false;
-    }
-    throw new AuthenticationError('invalid or missing refresh token');
+    return this.authService.refreshToken(context);
   }
 }

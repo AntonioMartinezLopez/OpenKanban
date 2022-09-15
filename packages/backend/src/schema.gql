@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Group {
+  """Group Id"""
+  id: String!
+
+  """The name of the group"""
+  name: String!
+
+  """Description of the group"""
+  description: String!
+}
+
 type User {
   """UserId"""
   userId: String!
@@ -11,6 +22,7 @@ type User {
 
   """The email of the user"""
   email: String!
+  groups: [Group!]!
 }
 
 type LoginResult {
@@ -25,6 +37,8 @@ type Query {
   users: [User!]!
   user(id: String!): User!
   whoAmI: User!
+  groups: [Group!]!
+  group(id: Int!): Group!
 }
 
 input LoginUserInput {
@@ -38,7 +52,11 @@ input LoginUserInput {
 type Mutation {
   register(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: String!): User!
+  removeUser: User!
+  createGroup(createGroupInput: CreateGroupInput!): Group!
+  addUserToGroup(groupId: String!, userId: String!): Group!
+  updateGroup(updateGroupInput: UpdateGroupInput!): Group!
+  removeGroup(id: Int!): Group!
 }
 
 input CreateUserInput {
@@ -54,12 +72,35 @@ input CreateUserInput {
 
 input UpdateUserInput {
   """Field for name of the new user"""
-  username: String!
+  username: String
 
   """Field for the email address of the new user"""
-  email: String!
+  email: String
 
   """Field for the password of the new user"""
-  password: String!
+  password: String
   userId: String!
+}
+
+input CreateGroupInput {
+  """The name of the group"""
+  name: String!
+
+  """Description of the group"""
+  description: String!
+
+  """First user and creator of the group"""
+  userId: String!
+}
+
+input UpdateGroupInput {
+  """The name of the group"""
+  name: String
+
+  """Description of the group"""
+  description: String
+
+  """First user and creator of the group"""
+  userId: String
+  id: Int!
 }
