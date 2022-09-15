@@ -1,0 +1,65 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  """UserId"""
+  userId: String!
+
+  """The name of the user"""
+  username: String!
+
+  """The email of the user"""
+  email: String!
+}
+
+type LoginResult {
+  """Example field (placeholder)"""
+  access_token: String!
+}
+
+type Query {
+  login(loginUserInput: LoginUserInput!): LoginResult!
+  logout: Boolean
+  refreshToken: LoginResult
+  users: [User!]!
+  user(id: String!): User!
+  whoAmI: User!
+}
+
+input LoginUserInput {
+  """Example field (placeholder)"""
+  username: String!
+
+  """Example field (placeholder)"""
+  password: String!
+}
+
+type Mutation {
+  register(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: String!): User!
+}
+
+input CreateUserInput {
+  """Field for name of the new user"""
+  username: String!
+
+  """Field for the email address of the new suer"""
+  email: String!
+
+  """Field for the password of the new user"""
+  password: String!
+}
+
+input UpdateUserInput {
+  """Field for name of the new user"""
+  username: String!
+
+  """Field for the email address of the new user"""
+  email: String!
+
+  """Field for the password of the new user"""
+  password: String!
+  userId: String!
+}
