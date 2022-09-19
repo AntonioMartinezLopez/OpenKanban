@@ -3,8 +3,10 @@ import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -28,4 +30,8 @@ export class Group {
   })
   @JoinTable()
   users: User[];
+
+  @OneToOne(() => User, { onDelete: 'SET NULL' })
+  @JoinColumn()
+  creator: User;
 }

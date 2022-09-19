@@ -11,6 +11,7 @@ type Group {
 
   """Description of the group"""
   description: String!
+  creator: User
 }
 
 type User {
@@ -38,7 +39,7 @@ type Query {
   user(id: String!): User!
   whoAmI: User!
   groups: [Group!]!
-  group(id: Int!): Group!
+  group(id: String, name: String): Group
 }
 
 input LoginUserInput {
@@ -55,8 +56,9 @@ type Mutation {
   removeUser: User!
   createGroup(createGroupInput: CreateGroupInput!): Group!
   addUserToGroup(groupId: String!, userId: String!): Group!
+  removeUserToGroup(groupId: String!, userId: String!): Group!
   updateGroup(updateGroupInput: UpdateGroupInput!): Group!
-  removeGroup(id: Int!): Group!
+  removeGroup(groupId: String!): Group!
 }
 
 input CreateUserInput {
@@ -95,12 +97,14 @@ input CreateGroupInput {
 
 input UpdateGroupInput {
   """The name of the group"""
-  name: String
+  name: String!
 
   """Description of the group"""
-  description: String
+  description: String!
 
   """First user and creator of the group"""
   userId: String
-  id: Int!
+
+  """The id of the group"""
+  id: String!
 }

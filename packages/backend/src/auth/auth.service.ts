@@ -16,6 +16,21 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  isTokenValid(token: string): boolean {
+    let validToken = false;
+    this.jwtService
+      .verifyAsync(token)
+      .then(() => {
+        validToken = true;
+      })
+      .catch(() => {
+        this.logger.error('INVALID TOKEN');
+        validToken = false;
+      });
+
+    return validToken;
+  }
+
   async validateUser(username: string, pass: string): Promise<User | null> {
     const user = await this.userService.findOneByName(username);
 
@@ -58,10 +73,12 @@ export class AuthService {
       { expiresIn: '1d' },
     );
 
-    // load the refreshtoken array
+    // load the refreshtoken array and check also for invalid tokens
     const newRefreshTokenArray = !cookies?.jwt
-      ? user.refreshToken
-      : user.refreshToken.filter((rt) => rt !== cookies.jwt);
+      ? user.refreshToken.filter((rt) => this.isTokenValid(rt))
+      : user.refreshToken.filter(
+          (rt) => rt !== cookies.jwt || this.isTokenValid(rt),
+        );
 
     //Before adding to response, check if cookies containing jwt is used by other users
     /* 
