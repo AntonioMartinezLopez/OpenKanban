@@ -14,10 +14,14 @@ import { User } from 'src/user/entities/user.entity';
 import { ForbiddenException, UseGuards } from '@nestjs/common';
 import { GqlJwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/user/decorators/currentUser.decorator';
+import { UserService } from 'src/user/user.service';
 
 @Resolver(() => Group)
 export class GroupsResolver {
-  constructor(private readonly groupsService: GroupsService) {}
+  constructor(
+    private readonly groupsService: GroupsService,
+    private readonly userService: UserService,
+  ) {}
 
   @Mutation(() => Group)
   createGroup(@Args('createGroupInput') createGroupInput: CreateGroupInput) {
@@ -33,7 +37,7 @@ export class GroupsResolver {
   }
 
   @Mutation(() => Group)
-  removeUserToGroup(
+  removeUserFromGroup(
     @Args('groupId') groupId: string,
     @Args('userId') userId: string,
   ) {
@@ -74,5 +78,10 @@ export class GroupsResolver {
   @ResolveField(() => User, { nullable: true })
   async creator(@Parent() group: Group): Promise<User> {
     return this.groupsService.getCreator(group.id);
+  }
+
+  @ResolveField(() => [User], { nullable: true })
+  async users(@Parent() group: Group): Promise<User[]> {
+    return this.userService.findAllUserFromGroup(group.id);
   }
 }

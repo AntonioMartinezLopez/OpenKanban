@@ -12,6 +12,7 @@ type Group {
   """Description of the group"""
   description: String!
   creator: User
+  users: [User!]
 }
 
 type User {
@@ -31,6 +32,36 @@ type LoginResult {
   access_token: String!
 }
 
+type Task {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Board {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Column {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Label {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Message {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Tasklog {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   login(loginUserInput: LoginUserInput!): LoginResult!
   logout: Boolean
@@ -40,6 +71,12 @@ type Query {
   whoAmI: User!
   groups: [Group!]!
   group(id: String, name: String): Group
+  task(id: Int!): Task!
+  board(id: Int!): Board!
+  column(id: Int!): Column!
+  label(id: Int!): Label!
+  message(id: Int!): Message!
+  tasklog(id: Int!): Tasklog!
 }
 
 input LoginUserInput {
@@ -56,9 +93,27 @@ type Mutation {
   removeUser: User!
   createGroup(createGroupInput: CreateGroupInput!): Group!
   addUserToGroup(groupId: String!, userId: String!): Group!
-  removeUserToGroup(groupId: String!, userId: String!): Group!
+  removeUserFromGroup(groupId: String!, userId: String!): Group!
   updateGroup(updateGroupInput: UpdateGroupInput!): Group!
   removeGroup(groupId: String!): Group!
+  createTask(createTaskInput: CreateTaskInput!): Task!
+  updateTask(updateTaskInput: UpdateTaskInput!): Task!
+  removeTask(id: Int!): Task!
+  createBoard(createBoardInput: CreateBoardInput!): Board!
+  updateBoard(updateBoardInput: UpdateBoardInput!): Board!
+  removeBoard(id: Int!): Board!
+  createColumn(createColumnInput: CreateColumnInput!): Column!
+  updateColumn(updateColumnInput: UpdateColumnInput!): Column!
+  removeColumn(id: Int!): Column!
+  createLabel(createLabelInput: CreateLabelInput!): Label!
+  updateLabel(updateLabelInput: UpdateLabelInput!): Label!
+  removeLabel(id: Int!): Label!
+  createMessage(createMessageInput: CreateMessageInput!): Message!
+  updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  removeMessage(id: Int!): Message!
+  createTasklog(createTasklogInput: CreateTasklogInput!): Tasklog!
+  updateTasklog(updateTasklogInput: UpdateTasklogInput!): Tasklog!
+  removeTasklog(id: Int!): Tasklog!
 }
 
 input CreateUserInput {
@@ -97,14 +152,80 @@ input CreateGroupInput {
 
 input UpdateGroupInput {
   """The name of the group"""
-  name: String!
+  name: String
 
   """Description of the group"""
-  description: String!
+  description: String
 
   """First user and creator of the group"""
   userId: String
 
   """The id of the group"""
   id: String!
+}
+
+input CreateTaskInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTaskInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateBoardInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateBoardInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateColumnInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateColumnInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateLabelInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateLabelInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateMessageInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateMessageInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input CreateTasklogInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTasklogInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }

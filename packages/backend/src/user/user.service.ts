@@ -1,7 +1,5 @@
 import {
   ForbiddenException,
-  forwardRef,
-  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -12,8 +10,6 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput, UpdateUserInputAuth } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
-import { GroupsService } from 'src/groups/groups.service';
-
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -21,9 +17,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-
-    @Inject(forwardRef(() => GroupsService))
-    private groupService: GroupsService,
   ) {}
 
   // C for CREATE
@@ -72,6 +65,13 @@ export class UserService {
       })
       .getOne();
     // .where(":refreshToken = ANY ( string_to_array(user.refreshToken, ','))", { refreshToken: refreshToken })
+  }
+
+  async findAllUserFromGroup(groupId: string): Promise<User[]> {
+    return this.usersRepository.find({
+      relations: ['groups'],
+      where: { groups: { id: groupId } },
+    });
   }
 
   // U for UPDATE

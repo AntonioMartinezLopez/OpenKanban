@@ -11,6 +11,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user/entities/user.entity';
 import { GroupsModule } from './groups/groups.module';
 import { Group } from './groups/entities/group.entity';
+import { TaskModule } from './task/task.module';
+import { BoardModule } from './board/board.module';
+import { ColumnModule } from './column/column.module';
+import { LabelModule } from './label/label.module';
+import { MessageModule } from './message/message.module';
+import { TasklogModule } from './tasklog/tasklog.module';
 
 @Module({
   imports: [
@@ -37,6 +43,12 @@ import { Group } from './groups/entities/group.entity';
     AuthModule,
     UserModule,
     GroupsModule,
+    TaskModule,
+    BoardModule,
+    ColumnModule,
+    LabelModule,
+    MessageModule,
+    TasklogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
