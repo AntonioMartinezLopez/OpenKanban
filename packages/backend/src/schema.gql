@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Board {
+  """Board id"""
+  id: String!
+
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+}
+
 type Group {
   """Group Id"""
   id: String!
@@ -33,11 +44,6 @@ type LoginResult {
 }
 
 type Task {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-type Board {
   """Example field (placeholder)"""
   exampleField: Int!
 }
@@ -148,6 +154,12 @@ input CreateGroupInput {
 
   """First user and creator of the group"""
   userId: String!
+
+  """The name of the board"""
+  boardname: String
+
+  """The description of the board"""
+  boardDescription: String
 }
 
 input UpdateGroupInput {
@@ -159,6 +171,12 @@ input UpdateGroupInput {
 
   """First user and creator of the group"""
   userId: String
+
+  """The name of the board"""
+  boardname: String
+
+  """The description of the board"""
+  boardDescription: String
 
   """The id of the group"""
   id: String!
@@ -176,14 +194,28 @@ input UpdateTaskInput {
 }
 
 input CreateBoardInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+
+  """Group Id"""
+  groupId: String!
 }
 
 input UpdateBoardInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+
+  """Group Id"""
+  groupId: String
+
+  """Id of the board"""
+  id: String!
 }
 
 input CreateColumnInput {

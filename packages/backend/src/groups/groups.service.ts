@@ -7,6 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Board } from 'src/board/entities/board.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
@@ -35,6 +36,14 @@ export class GroupsService {
     newGroup.description = createGroupInput.description;
     newGroup.users = [user];
     newGroup.creator = user;
+
+    // direct initialization of a board
+    if (createGroupInput.boardname && createGroupInput.boardDescription) {
+      const newBoard = new Board();
+      newBoard.name = createGroupInput.boardname;
+      newBoard.description = createGroupInput.boardDescription;
+      newGroup.board = newBoard;
+    }
 
     return this.groupRepository.save(newGroup);
   }

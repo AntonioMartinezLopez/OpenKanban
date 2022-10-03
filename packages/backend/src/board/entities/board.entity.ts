@@ -1,7 +1,22 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
+import { Group } from 'src/groups/entities/group.entity';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+@Entity()
 @ObjectType()
 export class Board {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @PrimaryGeneratedColumn('uuid')
+  @Field({ description: 'Board id' })
+  id: string;
+
+  @Column('text')
+  @Field({ description: 'The name of the board' })
+  name: string;
+
+  @Column('text')
+  @Field({ description: 'The desciription of the user' })
+  description: string;
+
+  // @OneToOne(() => Group, { onDelete: 'CASCADE' })
+  // group: Group;
 }

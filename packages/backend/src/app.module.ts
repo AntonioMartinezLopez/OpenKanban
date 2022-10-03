@@ -17,6 +17,7 @@ import { ColumnModule } from './column/column.module';
 import { LabelModule } from './label/label.module';
 import { MessageModule } from './message/message.module';
 import { TasklogModule } from './tasklog/tasklog.module';
+import { Board } from './board/entities/board.entity';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { TasklogModule } from './tasklog/tasklog.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Group],
+      entities: [User, Group, Board],
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({

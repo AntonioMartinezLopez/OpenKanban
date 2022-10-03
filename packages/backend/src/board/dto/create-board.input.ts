@@ -1,7 +1,13 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
 export class CreateBoardInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @Field({ description: 'The name of the board' })
+  name: string;
+
+  @Field({ description: 'The desciription of the user' })
+  description: string;
+
+  @Field({ description: 'Group Id' })
+  groupId: string;
 }

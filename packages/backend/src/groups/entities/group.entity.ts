@@ -1,4 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
+import { Board } from 'src/board/entities/board.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -34,4 +35,11 @@ export class Group {
   @OneToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn()
   creator: User;
+
+  @OneToOne(() => Board, {
+    cascade: ['insert', 'remove'],
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn()
+  board: Board;
 }
