@@ -7,6 +7,7 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -32,7 +33,7 @@ export class Group {
   @JoinTable()
   users: User[];
 
-  @OneToOne(() => User, { onDelete: 'SET NULL' })
+  @ManyToOne(() => User, (user) => user.userId, { onDelete: 'SET NULL' })
   @JoinColumn()
   creator: User;
 

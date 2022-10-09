@@ -93,15 +93,6 @@ export class GroupsService {
     });
   }
 
-  // use groupService for querying creator user as its an unidirectional relation
-  async getCreator(groupId: string): Promise<User> {
-    const group = await this.groupRepository.findOne({
-      relations: ['creator'],
-      where: { id: groupId },
-    });
-    return group.creator;
-  }
-
   findOnebyId(groupId: string): Promise<Group> {
     return this.groupRepository.findOneBy({ id: groupId });
   }
@@ -138,5 +129,23 @@ export class GroupsService {
       throw new ForbiddenException('Only creator itself must delete a group');
     }
     return this.groupRepository.remove(group);
+  }
+
+  // Field resolver functions
+  async resolveBoard(groupId: string): Promise<Board> {
+    const group = await this.groupRepository.findOne({
+      relations: ['board'],
+      where: { id: groupId },
+    });
+
+    return group.board;
+  }
+
+  async getCreator(groupId: string): Promise<User> {
+    const group = await this.groupRepository.findOne({
+      relations: ['creator'],
+      where: { id: groupId },
+    });
+    return group.creator;
   }
 }

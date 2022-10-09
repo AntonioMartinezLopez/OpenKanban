@@ -24,6 +24,7 @@ type Group {
   description: String!
   creator: User
   users: [User!]
+  board: Board
 }
 
 type User {
@@ -78,7 +79,8 @@ type Query {
   groups: [Group!]!
   group(id: String, name: String): Group
   task(id: Int!): Task!
-  board(id: Int!): Board!
+  boards: [Board!]!
+  board(id: String!): Board!
   column(id: Int!): Column!
   label(id: Int!): Label!
   message(id: Int!): Message!
@@ -107,7 +109,7 @@ type Mutation {
   removeTask(id: Int!): Task!
   createBoard(createBoardInput: CreateBoardInput!): Board!
   updateBoard(updateBoardInput: UpdateBoardInput!): Board!
-  removeBoard(id: Int!): Board!
+  removeBoard(id: String!): Board!
   createColumn(createColumnInput: CreateColumnInput!): Column!
   updateColumn(updateColumnInput: UpdateColumnInput!): Column!
   removeColumn(id: Int!): Column!

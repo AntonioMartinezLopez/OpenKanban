@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from 'src/groups/entities/group.entity';
 import { Repository } from 'typeorm';
@@ -17,14 +22,20 @@ export class BoardService {
     private groupRepository: Repository<Group>,
   ) {}
 
-  async create(createBoardInput: CreateBoardInput) {
-    const group = await this.groupRepository.findOneBy({
-      id: createBoardInput.groupId,
+  async create(createBoardInput: CreateBoardInput): Promise<Board> {
+    const group = await this.groupRepository.findOne({
+      relations: ['board'],
+      where: { id: createBoardInput.groupId },
     });
 
     // if group not found return exeception
     if (!group) {
       throw new NotFoundException('Unknown Group Id');
+    }
+
+    // prevent further process when group already initialized a board
+    if (group.board) {
+      throw new ForbiddenException('Group already has a board');
     }
     // create new Board
     const newBoard = new Board();
@@ -38,22 +49,34 @@ export class BoardService {
     const updatedGroup = await this.groupRepository.save(group);
 
     // return newly created board class from table
-    return this.boardRepository.findBy({ id: updatedGroup.board.id });
+    return updatedGroup.board;
   }
 
-  findAll() {
-    return `This action returns all board`;
+  findAll(): Promise<Board[]> {
+    return this.boardRepository.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} board`;
+  findOne(id: string): Promise<Board> {
+    return this.boardRepository.findOneBy({ id: id });
   }
 
-  update(id: string, updateBoardInput: UpdateBoardInput) {
-    return `This action updates a #${id} board`;
+  async update(id: string, updateBoardInput: UpdateBoardInput): Promise<Board> {
+    let board = await this.boardRepository.findOneBy({ id: id });
+
+    board = { ...board, ...updateBoardInput };
+    return this.boardRepository.save(board);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} board`;
+  async remove(id: string): Promise<Board> {
+    // load entity
+    const board = await this.boardRepository.findOneBy({ id: id });
+
+    if (board) {
+      return this.boardRepository.remove(board);
+    }
+
+    throw new NotFoundException('Unknown Board Id');
   }
+
+  //Field Resolvers
 }

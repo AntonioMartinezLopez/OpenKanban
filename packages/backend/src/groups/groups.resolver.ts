@@ -15,6 +15,7 @@ import { ForbiddenException, UseGuards } from '@nestjs/common';
 import { GqlJwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/user/decorators/currentUser.decorator';
 import { UserService } from 'src/user/user.service';
+import { Board } from 'src/board/entities/board.entity';
 
 @Resolver(() => Group)
 export class GroupsResolver {
@@ -83,5 +84,10 @@ export class GroupsResolver {
   @ResolveField(() => [User], { nullable: true })
   async users(@Parent() group: Group): Promise<User[]> {
     return this.userService.findAllUserFromGroup(group.id);
+  }
+
+  @ResolveField(() => Board, { nullable: true })
+  async board(@Parent() group: Group): Promise<Board> {
+    return this.groupsService.resolveBoard(group.id);
   }
 }

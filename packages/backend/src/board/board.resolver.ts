@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { BoardService } from './board.service';
 import { Board } from './entities/board.entity';
 import { CreateBoardInput } from './dto/create-board.input';
@@ -13,13 +13,13 @@ export class BoardResolver {
     return this.boardService.create(createBoardInput);
   }
 
-  @Query(() => [Board], { name: 'board' })
+  @Query(() => [Board], { name: 'boards' })
   findAll() {
     return this.boardService.findAll();
   }
 
   @Query(() => Board, { name: 'board' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id') id: string) {
     return this.boardService.findOne(id);
   }
 
@@ -29,7 +29,7 @@ export class BoardResolver {
   }
 
   @Mutation(() => Board)
-  removeBoard(@Args('id', { type: () => Int }) id: number) {
+  removeBoard(@Args('id') id: string) {
     return this.boardService.remove(id);
   }
 }
