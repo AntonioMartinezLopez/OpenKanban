@@ -1,6 +1,7 @@
 import { ObjectType, Field } from '@nestjs/graphql';
+import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
 // import { Group } from 'src/groups/entities/group.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 @ObjectType()
@@ -19,4 +20,8 @@ export class Board {
 
   // @OneToOne(() => Group, { onDelete: 'CASCADE' })
   // group: Group;
+  @OneToMany(() => Boardcolumn, (boardColumn) => boardColumn.board, {
+    cascade: true,
+  })
+  columns: Boardcolumn[];
 }

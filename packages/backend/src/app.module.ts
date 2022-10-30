@@ -13,11 +13,12 @@ import { GroupsModule } from './groups/groups.module';
 import { Group } from './groups/entities/group.entity';
 import { TaskModule } from './task/task.module';
 import { BoardModule } from './board/board.module';
-import { ColumnModule } from './column/column.module';
 import { LabelModule } from './label/label.module';
 import { MessageModule } from './message/message.module';
 import { TasklogModule } from './tasklog/tasklog.module';
 import { Board } from './board/entities/board.entity';
+import { BoardcolumnModule } from './boardcolumn/boardcolumn.module';
+import { Boardcolumn } from './boardcolumn/entities/boardcolumn.entity';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { Board } from './board/entities/board.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Group, Board],
+      entities: [User, Group, Board, Boardcolumn],
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -46,10 +47,10 @@ import { Board } from './board/entities/board.entity';
     GroupsModule,
     TaskModule,
     BoardModule,
-    ColumnModule,
     LabelModule,
     MessageModule,
     TasklogModule,
+    BoardcolumnModule,
   ],
   controllers: [AppController],
   providers: [AppService],

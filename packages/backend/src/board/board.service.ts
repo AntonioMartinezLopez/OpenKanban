@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
 import { Group } from 'src/groups/entities/group.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardInput } from './dto/create-board.input';
@@ -79,4 +80,11 @@ export class BoardService {
   }
 
   //Field Resolvers
+  async resolveBoardColumns(boardId: string): Promise<Boardcolumn[]> {
+    const result = await this.boardRepository.findOne({
+      relations: ['columns'],
+      where: { id: boardId },
+    });
+    return result.columns;
+  }
 }
