@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Task {
+  """Task Id"""
+  id: String!
+
+  """The name of the task"""
+  name: String!
+
+  """Description of the task"""
+  description: String!
+
+  """Calculated weight of a task"""
+  weight: Int!
+}
+
 type Boardcolumn {
   """Column Id"""
   id: String!
@@ -11,6 +25,7 @@ type Boardcolumn {
 
   """Maximum weight the column can hold"""
   maxWeight: Int!
+  tasks: [Task!]!
 }
 
 type Board {
@@ -23,6 +38,7 @@ type Board {
   """The desciription of the user"""
   description: String!
   columns: [Boardcolumn!]!
+  tasks: [Task!]!
 }
 
 type Group {
@@ -56,11 +72,6 @@ type LoginResult {
   access_token: String!
 }
 
-type Task {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type Label {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -85,13 +96,13 @@ type Query {
   whoAmI: User!
   groups: [Group!]!
   group(id: String, name: String): Group
-  task(id: Int!): Task!
+  task(id: String!): Task!
+  boardcolumn(id: String!): Boardcolumn!
   boards: [Board!]!
   board(id: String!): Board!
   label(id: Int!): Label!
   message(id: Int!): Message!
   tasklog(id: Int!): Tasklog!
-  boardcolumn(id: String!): Boardcolumn!
 }
 
 input LoginUserInput {
@@ -113,7 +124,10 @@ type Mutation {
   removeGroup(groupId: String!): Group!
   createTask(createTaskInput: CreateTaskInput!): Task!
   updateTask(updateTaskInput: UpdateTaskInput!): Task!
-  removeTask(id: Int!): Task!
+  removeTask(id: String!): Task!
+  createBoardcolumn(createBoardcolumnInput: CreateBoardcolumnInput!): Boardcolumn!
+  updateBoardcolumn(updateBoardcolumnInput: UpdateBoardcolumnInput!): Boardcolumn!
+  removeBoardcolumn(id: String!): Boardcolumn!
   createBoard(createBoardInput: CreateBoardInput!): Board!
   updateBoard(updateBoardInput: UpdateBoardInput!): Board!
   removeBoard(id: String!): Board!
@@ -126,9 +140,6 @@ type Mutation {
   createTasklog(createTasklogInput: CreateTasklogInput!): Tasklog!
   updateTasklog(updateTasklogInput: UpdateTasklogInput!): Tasklog!
   removeTasklog(id: Int!): Tasklog!
-  createBoardcolumn(createBoardcolumnInput: CreateBoardcolumnInput!): Boardcolumn!
-  updateBoardcolumn(updateBoardcolumnInput: UpdateBoardcolumnInput!): Boardcolumn!
-  removeBoardcolumn(id: String!): Boardcolumn!
 }
 
 input CreateUserInput {
@@ -192,14 +203,65 @@ input UpdateGroupInput {
 }
 
 input CreateTaskInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """The name of the task"""
+  name: String!
+
+  """Description of the task"""
+  description: String!
+
+  """Calculated weight of a task"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String!
 }
 
 input UpdateTaskInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """The name of the task"""
+  name: String!
+
+  """Description of the task"""
+  description: String!
+
+  """Calculated weight of a task"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String
+
+  """Task Id"""
+  id: String!
+
+  """Calculated weight of a task"""
+  weight: Int!
+
+  """BoardColumn Id"""
+  boardColumnId: String
+}
+
+input CreateBoardcolumnInput {
+  """The name of the Column"""
+  name: String!
+
+  """Maximum weight of tasks"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String!
+}
+
+input UpdateBoardcolumnInput {
+  """The name of the Column"""
+  name: String!
+
+  """Maximum weight of tasks"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String
+
+  """BoardColumn Id"""
+  id: String!
 }
 
 input CreateBoardInput {
@@ -258,29 +320,4 @@ input UpdateTasklogInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
-}
-
-input CreateBoardcolumnInput {
-  """The name of the Column"""
-  name: String!
-
-  """Maximum weight of tasks"""
-  maxWeight: Int
-
-  """Board Id"""
-  boardId: String!
-}
-
-input UpdateBoardcolumnInput {
-  """The name of the Column"""
-  name: String!
-
-  """Maximum weight of tasks"""
-  maxWeight: Int
-
-  """Board Id"""
-  boardId: String
-
-  """BoardColumn Id"""
-  boardColumnId: String!
 }

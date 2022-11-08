@@ -1,8 +1,16 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Parent,
+  ResolveField,
+} from '@nestjs/graphql';
 import { BoardcolumnService } from './boardcolumn.service';
 import { Boardcolumn } from './entities/boardcolumn.entity';
 import { CreateBoardcolumnInput } from './dto/create-boardcolumn.input';
 import { UpdateBoardcolumnInput } from './dto/update-boardcolumn.input';
+import { Task } from 'src/task/entities/task.entity';
 
 @Resolver(() => Boardcolumn)
 export class BoardcolumnResolver {
@@ -27,7 +35,7 @@ export class BoardcolumnResolver {
     updateBoardcolumnInput: UpdateBoardcolumnInput,
   ) {
     return this.boardcolumnService.update(
-      updateBoardcolumnInput.boardColumnId,
+      updateBoardcolumnInput.id,
       updateBoardcolumnInput,
     );
   }
@@ -35,5 +43,10 @@ export class BoardcolumnResolver {
   @Mutation(() => Boardcolumn)
   removeBoardcolumn(@Args('id') id: string) {
     return this.boardcolumnService.remove(id);
+  }
+
+  @ResolveField(() => [Task])
+  async tasks(@Parent() board: Boardcolumn): Promise<Task[]> {
+    return this.boardcolumnService.resolveTasks(board.id);
   }
 }

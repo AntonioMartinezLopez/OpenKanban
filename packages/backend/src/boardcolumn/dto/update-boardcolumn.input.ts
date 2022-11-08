@@ -6,7 +6,7 @@ export class UpdateBoardcolumnInput extends PartialType(
   CreateBoardcolumnInput,
 ) {
   @Field({ description: 'BoardColumn Id' })
-  boardColumnId: string;
+  id: string;
 
   @Field({ description: 'The name of the Column' })
   name: string;

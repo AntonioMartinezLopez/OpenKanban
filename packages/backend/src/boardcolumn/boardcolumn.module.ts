@@ -8,5 +8,6 @@ import { Boardcolumn } from './entities/boardcolumn.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Boardcolumn]), BoardModule],
   providers: [BoardcolumnResolver, BoardcolumnService],
+  exports: [BoardcolumnService],
 })
 export class BoardcolumnModule {}

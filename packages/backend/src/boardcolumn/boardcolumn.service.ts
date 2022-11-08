@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardService } from 'src/board/board.service';
+import { Task } from 'src/task/entities/task.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardcolumnInput } from './dto/create-boardcolumn.input';
 import { UpdateBoardcolumnInput } from './dto/update-boardcolumn.input';
@@ -41,16 +42,41 @@ export class BoardcolumnService {
   async findOne(id: string): Promise<Boardcolumn> {
     const boardCol = await this.boardColumnRepository.findOneBy({ id: id });
     if (!boardCol) {
-      throw new NotFoundException('Unknown Board Id');
+      throw new NotFoundException('Unknown Board Column Id');
     }
     return boardCol;
   }
 
-  update(id: string, updateBoardcolumnInput: UpdateBoardcolumnInput) {
-    return `This action updates a #${id} boardcolumn`;
+  async update(
+    id: string,
+    updateBoardcolumnInput: UpdateBoardcolumnInput,
+  ): Promise<Boardcolumn> {
+    let boardCol = await this.boardColumnRepository.findOneBy({ id: id });
+    if (!boardCol) {
+      throw new NotFoundException('Unknown Board Column Id');
+    }
+
+    boardCol = { ...boardCol, ...updateBoardcolumnInput };
+
+    return this.boardColumnRepository.save(boardCol);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} boardcolumn`;
+  async remove(id: string) {
+    const boardCol = await this.boardColumnRepository.findOneBy({ id: id });
+    if (boardCol) {
+      return this.boardColumnRepository.remove(boardCol);
+    }
+
+    throw new NotFoundException('Unknown Board Column Id');
+  }
+
+  //Resolver functions
+
+  async resolveTasks(boardColumnId: string): Promise<Task[]> {
+    const result = await this.boardColumnRepository.findOne({
+      relations: ['tasks'],
+      where: { id: boardColumnId },
+    });
+    return result.tasks;
   }
 }
