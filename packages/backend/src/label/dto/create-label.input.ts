@@ -1,7 +1,13 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
 export class CreateLabelInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @Field({ description: 'The name of the label' })
+  name: string;
+
+  @Field({ description: 'color of the label' })
+  color: string;
+
+  @Field({ description: 'id of the corresponding board' })
+  boardId: string;
 }

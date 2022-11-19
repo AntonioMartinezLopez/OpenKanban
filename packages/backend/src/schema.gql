@@ -28,6 +28,17 @@ type Boardcolumn {
   tasks: [Task!]!
 }
 
+type Label {
+  """Label Id"""
+  id: String!
+
+  """The name of the label"""
+  name: String!
+
+  """Color of the label"""
+  color: String!
+}
+
 type Board {
   """Board id"""
   id: String!
@@ -39,6 +50,7 @@ type Board {
   description: String!
   columns: [Boardcolumn!]!
   tasks: [Task!]!
+  labels: [Label!]!
 }
 
 type Group {
@@ -72,11 +84,6 @@ type LoginResult {
   access_token: String!
 }
 
-type Label {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type Message {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -100,7 +107,7 @@ type Query {
   boardcolumn(id: String!): Boardcolumn!
   boards: [Board!]!
   board(id: String!): Board!
-  label(id: Int!): Label!
+  label(id: String!): Label!
   message(id: Int!): Message!
   tasklog(id: Int!): Tasklog!
 }
@@ -133,7 +140,7 @@ type Mutation {
   removeBoard(id: String!): Board!
   createLabel(createLabelInput: CreateLabelInput!): Label!
   updateLabel(updateLabelInput: UpdateLabelInput!): Label!
-  removeLabel(id: Int!): Label!
+  removeLabel(id: String!): Label!
   createMessage(createMessageInput: CreateMessageInput!): Message!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
   removeMessage(id: Int!): Message!
@@ -290,14 +297,28 @@ input UpdateBoardInput {
 }
 
 input CreateLabelInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """The name of the label"""
+  name: String!
+
+  """color of the label"""
+  color: String!
+
+  """id of the corresponding board"""
+  boardId: String!
 }
 
 input UpdateLabelInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """The name of the label"""
+  name: String!
+
+  """color of the label"""
+  color: String!
+
+  """id of the corresponding board"""
+  boardId: String
+
+  """id of the label"""
+  labelId: String!
 }
 
 input CreateMessageInput {

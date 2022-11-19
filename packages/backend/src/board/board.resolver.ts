@@ -12,6 +12,7 @@ import { CreateBoardInput } from './dto/create-board.input';
 import { UpdateBoardInput } from './dto/update-board.input';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
 import { Task } from 'src/task/entities/task.entity';
+import { Label } from 'src/label/entities/label.entity';
 
 @Resolver(() => Board)
 export class BoardResolver {
@@ -50,5 +51,10 @@ export class BoardResolver {
   @ResolveField(() => [Task])
   async tasks(@Parent() board: Board): Promise<Task[]> {
     return this.boardService.resolveTasks(board.id);
+  }
+
+  @ResolveField(() => [Label])
+  async labels(@Parent() board: Board): Promise<Label[]> {
+    return this.boardService.resolveLabels(board.id);
   }
 }

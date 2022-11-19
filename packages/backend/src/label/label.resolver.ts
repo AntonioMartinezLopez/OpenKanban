@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { LabelService } from './label.service';
 import { Label } from './entities/label.entity';
 import { CreateLabelInput } from './dto/create-label.input';
@@ -13,23 +13,23 @@ export class LabelResolver {
     return this.labelService.create(createLabelInput);
   }
 
-  @Query(() => [Label], { name: 'label' })
-  findAll() {
-    return this.labelService.findAll();
-  }
+  // @Query(() => [Label], { name: 'label' })
+  // findAll() {
+  //   return this.labelService.findAll();
+  // }
 
   @Query(() => Label, { name: 'label' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => String }) id: string) {
     return this.labelService.findOne(id);
   }
 
   @Mutation(() => Label)
   updateLabel(@Args('updateLabelInput') updateLabelInput: UpdateLabelInput) {
-    return this.labelService.update(updateLabelInput.id, updateLabelInput);
+    return this.labelService.update(updateLabelInput);
   }
 
   @Mutation(() => Label)
-  removeLabel(@Args('id', { type: () => Int }) id: number) {
+  removeLabel(@Args('id', { type: () => String }) id: string) {
     return this.labelService.remove(id);
   }
 }

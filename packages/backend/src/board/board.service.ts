@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
 import { Group } from 'src/groups/entities/group.entity';
+import { Label } from 'src/label/entities/label.entity';
 import { Task } from 'src/task/entities/task.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardInput } from './dto/create-board.input';
@@ -95,5 +96,13 @@ export class BoardService {
       where: { id: boardId },
     });
     return result.tasks;
+  }
+
+  async resolveLabels(boardId: string): Promise<Label[]> {
+    const result = await this.boardRepository.findOne({
+      relations: ['labels'],
+      where: { id: boardId },
+    });
+    return result.labels;
   }
 }

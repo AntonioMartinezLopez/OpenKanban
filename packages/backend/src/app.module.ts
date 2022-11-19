@@ -20,6 +20,7 @@ import { Board } from './board/entities/board.entity';
 import { BoardcolumnModule } from './boardcolumn/boardcolumn.module';
 import { Boardcolumn } from './boardcolumn/entities/boardcolumn.entity';
 import { Task } from './task/entities/task.entity';
+import { Label } from './label/entities/label.entity';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { Task } from './task/entities/task.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Group, Board, Boardcolumn, Task],
+      entities: [User, Group, Board, Boardcolumn, Task, Label],
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
