@@ -17,4 +17,7 @@ export class UpdateTaskInput extends PartialType(CreateTaskInput) {
 
   @Field({ description: 'BoardColumn Id', nullable: true })
   boardColumnId: string;
+
+  @Field(() => [String], { description: 'Board Id' })
+  assignees: string[];
 }

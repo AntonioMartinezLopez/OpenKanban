@@ -7,6 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from 'src/board/entities/board.entity';
 import { BoardcolumnService } from 'src/boardcolumn/boardcolumn.service';
+import { User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateTaskInput } from './dto/create-task.input';
 import { UpdateTaskInput } from './dto/update-task.input';
@@ -21,9 +23,12 @@ export class TaskService {
     private boardRepository: Repository<Board>,
     @Inject(forwardRef(() => BoardcolumnService))
     private boardColumnService: BoardcolumnService,
+    @Inject(UserService)
+    private userService: UserService,
   ) {}
 
   async create(createTaskInput: CreateTaskInput) {
+    // search for board
     const board = await this.boardRepository.findOneBy({
       id: createTaskInput.boardId,
     });
@@ -32,11 +37,23 @@ export class TaskService {
       throw new NotFoundException('Unknown board Id');
     }
 
+    // search for assigned users
+    const users = [] as User[];
+    for (const userId of createTaskInput.assignees) {
+      const userFound = await this.userService.findOneById(userId);
+      if (!userFound) {
+        throw new NotFoundException('Unknown user Id');
+      }
+
+      users.push(userFound);
+    }
+
     const newTask = new Task();
     newTask.name = createTaskInput.name;
     newTask.description = createTaskInput.description;
     newTask.weight = createTaskInput.maxWeight;
     newTask.board = board;
+    newTask.assignees = users;
 
     return this.taskRepository.save(newTask);
   }
@@ -52,14 +69,27 @@ export class TaskService {
     return this.taskRepository.findOneBy({ id: taskId });
   }
 
-  async update(taskId: string, updateTaskInput: UpdateTaskInput) {
-    let task = await this.taskRepository.findOneBy({ id: taskId });
+  async update(updateTaskInput: UpdateTaskInput) {
+    const { id, assignees, ...props } = updateTaskInput;
+
+    let task = await this.taskRepository.findOneBy({ id: id });
 
     if (!task) {
       throw new NotFoundException('Unknown Task id');
     }
 
-    task = { ...task, ...updateTaskInput };
+    // search for assigned users
+    const assignedUsers = [] as User[];
+    for (const userId of assignees) {
+      const userFound = await this.userService.findOneById(userId);
+      if (!userFound) {
+        throw new NotFoundException('Unknown user Id');
+      }
+
+      assignedUsers.push(userFound);
+    }
+
+    task = { ...task, ...props, assignees: assignedUsers };
 
     // check if new column was set
     if (updateTaskInput.boardColumnId) {
@@ -82,5 +112,15 @@ export class TaskService {
     }
 
     return this.taskRepository.remove(task);
+  }
+
+  // resolver
+  async getAssignees(taskid: string): Promise<User[]> {
+    const task = await this.taskRepository.findOne({
+      relations: ['assignees'],
+      where: { id: taskid },
+    });
+
+    return task.assignees;
   }
 }

@@ -16,4 +16,7 @@ export class CreateTaskInput {
 
   @Field({ description: 'Board Id' })
   boardId: string;
+
+  @Field(() => [String], { description: 'Board Id' })
+  assignees: string[];
 }

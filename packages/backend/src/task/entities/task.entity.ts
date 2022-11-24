@@ -1,10 +1,13 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { Board } from 'src/board/entities/board.entity';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -44,4 +47,12 @@ export class Task {
     cascade: ['insert'],
   })
   boardColumn: Boardcolumn;
+
+  @ManyToMany(() => User, (user) => user.tasks, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinTable()
+  assignees: User[];
 }

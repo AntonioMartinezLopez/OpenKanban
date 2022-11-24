@@ -1,5 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Group } from 'src/groups/entities/group.entity';
+import { Task } from 'src/task/entities/task.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -29,4 +30,7 @@ export class User {
     eager: true,
   })
   groups: Group[];
+
+  @ManyToMany(() => Task, (task) => task.assignees)
+  tasks: Task[];
 }

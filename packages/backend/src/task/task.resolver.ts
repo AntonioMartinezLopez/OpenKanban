@@ -1,8 +1,16 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { TaskService } from './task.service';
 import { Task } from './entities/task.entity';
 import { CreateTaskInput } from './dto/create-task.input';
 import { UpdateTaskInput } from './dto/update-task.input';
+import { User } from 'src/user/entities/user.entity';
 
 @Resolver(() => Task)
 export class TaskResolver {
@@ -25,11 +33,17 @@ export class TaskResolver {
 
   @Mutation(() => Task)
   updateTask(@Args('updateTaskInput') updateTaskInput: UpdateTaskInput) {
-    return this.taskService.update(updateTaskInput.id, updateTaskInput);
+    return this.taskService.update(updateTaskInput);
   }
 
   @Mutation(() => Task)
   removeTask(@Args('id') id: string) {
     return this.taskService.remove(id);
+  }
+
+  @ResolveField(() => [User])
+  async assignees(@Parent() task: Task): Promise<User[]> {
+    const { id } = task;
+    return this.taskService.getAssignees(id);
   }
 }

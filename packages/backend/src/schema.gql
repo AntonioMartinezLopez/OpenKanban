@@ -14,6 +14,7 @@ type Task {
 
   """Calculated weight of a task"""
   weight: Int!
+  assignees: [User!]!
 }
 
 type Boardcolumn {
@@ -221,6 +222,9 @@ input CreateTaskInput {
 
   """Board Id"""
   boardId: String!
+
+  """Board Id"""
+  assignees: [String!]!
 }
 
 input UpdateTaskInput {
@@ -235,6 +239,9 @@ input UpdateTaskInput {
 
   """Board Id"""
   boardId: String
+
+  """Board Id"""
+  assignees: [String!]!
 
   """Task Id"""
   id: String!
