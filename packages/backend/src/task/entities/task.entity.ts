@@ -49,9 +49,7 @@ export class Task {
   boardColumn: Boardcolumn;
 
   @ManyToMany(() => User, (user) => user.tasks, {
-    cascade: true,
-    onDelete: 'CASCADE',
-    eager: true,
+    cascade: ['insert', 'update'],
   })
   @JoinTable()
   assignees: User[];

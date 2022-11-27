@@ -7,7 +7,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { BoardService } from 'src/board/board.service';
 import { Board } from 'src/board/entities/board.entity';
+import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
@@ -25,6 +27,8 @@ export class GroupsService {
     private groupRepository: Repository<Group>,
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
+    @Inject(BoardService)
+    private boardService: BoardService,
   ) {}
 
   async create(createGroupInput: CreateGroupInput): Promise<Group> {
@@ -116,7 +120,7 @@ export class GroupsService {
 
   async remove(callingUser: string, groupId: string) {
     const group = await this.groupRepository.findOne({
-      relations: ['creator'],
+      relations: ['creator', 'board'],
       where: { id: groupId },
     });
 
@@ -128,6 +132,9 @@ export class GroupsService {
     if (group.creator.userId && group.creator.userId !== callingUser) {
       throw new ForbiddenException('Only creator itself must delete a group');
     }
+
+    // delete corresponding board instance
+    await this.boardService.remove(group.board.id);
     return this.groupRepository.remove(group);
   }
 
@@ -147,5 +154,14 @@ export class GroupsService {
       where: { id: groupId },
     });
     return group.creator;
+  }
+
+  async messages(groupId: string): Promise<Message[]> {
+    const group = await this.groupRepository.findOne({
+      relations: ['messages'],
+      where: { id: groupId },
+    });
+
+    return group.messages;
   }
 }

@@ -1,5 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Board } from 'src/board/entities/board.entity';
+import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -8,6 +9,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -43,4 +45,7 @@ export class Group {
   })
   @JoinColumn()
   board: Board;
+
+  @OneToMany(() => Message, (msg) => msg.group)
+  messages: Message[];
 }

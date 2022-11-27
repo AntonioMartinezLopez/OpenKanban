@@ -21,6 +21,7 @@ import { BoardcolumnModule } from './boardcolumn/boardcolumn.module';
 import { Boardcolumn } from './boardcolumn/entities/boardcolumn.entity';
 import { Task } from './task/entities/task.entity';
 import { Label } from './label/entities/label.entity';
+import { Message } from './message/entities/message.entity';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { Label } from './label/entities/label.entity';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User, Group, Board, Boardcolumn, Task, Label],
+      entities: [User, Group, Board, Boardcolumn, Task, Label, Message],
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({

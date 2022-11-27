@@ -16,6 +16,7 @@ import { GqlJwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/user/decorators/currentUser.decorator';
 import { UserService } from 'src/user/user.service';
 import { Board } from 'src/board/entities/board.entity';
+import { Message } from 'src/message/entities/message.entity';
 
 @Resolver(() => Group)
 export class GroupsResolver {
@@ -89,5 +90,10 @@ export class GroupsResolver {
   @ResolveField(() => Board, { nullable: true })
   async board(@Parent() group: Group): Promise<Board> {
     return this.groupsService.resolveBoard(group.id);
+  }
+
+  @ResolveField(() => [Message])
+  async messages(@Parent() group: Group): Promise<Message[]> {
+    return this.groupsService.messages(group.id);
   }
 }

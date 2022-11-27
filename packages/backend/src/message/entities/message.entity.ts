@@ -1,7 +1,43 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
+import { Group } from 'src/groups/entities/group.entity';
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
+@Entity()
 @ObjectType()
 export class Message {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @PrimaryGeneratedColumn('uuid')
+  @Field({ description: 'Message Id' })
+  id: string;
+
+  @CreateDateColumn()
+  created: Date;
+
+  @UpdateDateColumn()
+  updated: Date;
+
+  @Column('text')
+  @Field({ description: 'The content of the message' })
+  text: string;
+
+  @ManyToOne(() => User, (user) => user.userId, {
+    onDelete: 'SET NULL',
+    eager: true,
+  })
+  @JoinColumn()
+  creator: User;
+
+  @ManyToOne(() => Group, (group) => group.messages, {
+    cascade: ['insert'],
+    onDelete: 'CASCADE',
+  })
+  group: Group;
 }

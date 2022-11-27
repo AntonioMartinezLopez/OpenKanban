@@ -20,8 +20,6 @@ export class Board {
   @Field({ description: 'The desciription of the user' })
   description: string;
 
-  // @OneToOne(() => Group, { onDelete: 'CASCADE' })
-  // group: Group;
   @OneToMany(() => Boardcolumn, (boardColumn) => boardColumn.board, {
     cascade: true,
   })

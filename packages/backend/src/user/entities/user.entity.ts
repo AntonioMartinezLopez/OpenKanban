@@ -31,6 +31,9 @@ export class User {
   })
   groups: Group[];
 
-  @ManyToMany(() => Task, (task) => task.assignees)
+  @ManyToMany(() => Task, (task) => task.assignees, {
+    cascade: ['remove'],
+    onDelete: 'CASCADE',
+  })
   tasks: Task[];
 }

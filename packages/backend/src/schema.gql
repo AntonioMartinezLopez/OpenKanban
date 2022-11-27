@@ -54,6 +54,14 @@ type Board {
   labels: [Label!]!
 }
 
+type Message {
+  """Message Id"""
+  id: String!
+
+  """The content of the message"""
+  text: String!
+}
+
 type Group {
   """Group Id"""
   id: String!
@@ -66,6 +74,7 @@ type Group {
   creator: User
   users: [User!]
   board: Board
+  messages: [Message!]!
 }
 
 type User {
@@ -85,11 +94,6 @@ type LoginResult {
   access_token: String!
 }
 
-type Message {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type Tasklog {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -104,12 +108,12 @@ type Query {
   whoAmI: User!
   groups: [Group!]!
   group(id: String, name: String): Group
-  task(id: String!): Task!
-  boardcolumn(id: String!): Boardcolumn!
   boards: [Board!]!
   board(id: String!): Board!
+  task(id: String!): Task!
+  boardcolumn(id: String!): Boardcolumn!
   label(id: String!): Label!
-  message(id: Int!): Message!
+  message(groupId: String!): [Message!]!
   tasklog(id: Int!): Tasklog!
 }
 
@@ -130,21 +134,21 @@ type Mutation {
   removeUserFromGroup(groupId: String!, userId: String!): Group!
   updateGroup(updateGroupInput: UpdateGroupInput!): Group!
   removeGroup(groupId: String!): Group!
+  createBoard(createBoardInput: CreateBoardInput!): Board!
+  updateBoard(updateBoardInput: UpdateBoardInput!): Board!
+  removeBoard(id: String!): Board!
   createTask(createTaskInput: CreateTaskInput!): Task!
   updateTask(updateTaskInput: UpdateTaskInput!): Task!
   removeTask(id: String!): Task!
   createBoardcolumn(createBoardcolumnInput: CreateBoardcolumnInput!): Boardcolumn!
   updateBoardcolumn(updateBoardcolumnInput: UpdateBoardcolumnInput!): Boardcolumn!
   removeBoardcolumn(id: String!): Boardcolumn!
-  createBoard(createBoardInput: CreateBoardInput!): Board!
-  updateBoard(updateBoardInput: UpdateBoardInput!): Board!
-  removeBoard(id: String!): Board!
   createLabel(createLabelInput: CreateLabelInput!): Label!
   updateLabel(updateLabelInput: UpdateLabelInput!): Label!
   removeLabel(id: String!): Label!
   createMessage(createMessageInput: CreateMessageInput!): Message!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
-  removeMessage(id: Int!): Message!
+  removeMessage(id: String!): Message!
   createTasklog(createTasklogInput: CreateTasklogInput!): Tasklog!
   updateTasklog(updateTasklogInput: UpdateTasklogInput!): Tasklog!
   removeTasklog(id: Int!): Tasklog!
@@ -207,6 +211,31 @@ input UpdateGroupInput {
   boardDescription: String
 
   """The id of the group"""
+  id: String!
+}
+
+input CreateBoardInput {
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+
+  """Group Id"""
+  groupId: String!
+}
+
+input UpdateBoardInput {
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+
+  """Group Id"""
+  groupId: String
+
+  """Id of the board"""
   id: String!
 }
 
@@ -278,31 +307,6 @@ input UpdateBoardcolumnInput {
   id: String!
 }
 
-input CreateBoardInput {
-  """The name of the board"""
-  name: String!
-
-  """The desciription of the user"""
-  description: String!
-
-  """Group Id"""
-  groupId: String!
-}
-
-input UpdateBoardInput {
-  """The name of the board"""
-  name: String!
-
-  """The desciription of the user"""
-  description: String!
-
-  """Group Id"""
-  groupId: String
-
-  """Id of the board"""
-  id: String!
-}
-
 input CreateLabelInput {
   """The name of the label"""
   name: String!
@@ -329,14 +333,28 @@ input UpdateLabelInput {
 }
 
 input CreateMessageInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """The content of the message"""
+  text: String!
+
+  """The creator of the message """
+  creatorId: String!
+
+  """The id of the group"""
+  groupId: String!
 }
 
 input UpdateMessageInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """the text of the message"""
+  text: String!
+
+  """The creator of the message """
+  creatorId: String
+
+  """The id of the group"""
+  groupId: String
+
+  """The id of the updating message"""
+  messageId: String!
 }
 
 input CreateTasklogInput {
