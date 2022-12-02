@@ -38,6 +38,7 @@ export class Message {
   @ManyToOne(() => Group, (group) => group.messages, {
     cascade: ['insert'],
     onDelete: 'CASCADE',
+    eager: true,
   })
   group: Group;
 }

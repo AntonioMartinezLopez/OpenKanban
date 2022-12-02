@@ -5,24 +5,27 @@ import {
   Args,
   ResolveField,
   Parent,
+  Subscription,
 } from '@nestjs/graphql';
 import { GroupsService } from './groups.service';
 import { Group } from './entities/group.entity';
 import { CreateGroupInput } from './dto/create-group.input';
 import { UpdateGroupInput } from './dto/update-group.input';
 import { User } from 'src/user/entities/user.entity';
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { ForbiddenException, Inject, UseGuards } from '@nestjs/common';
 import { GqlJwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/user/decorators/currentUser.decorator';
 import { UserService } from 'src/user/user.service';
 import { Board } from 'src/board/entities/board.entity';
 import { Message } from 'src/message/entities/message.entity';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 
 @Resolver(() => Group)
 export class GroupsResolver {
   constructor(
     private readonly groupsService: GroupsService,
     private readonly userService: UserService,
+    @Inject('PUB_SUB') private pubSub: RedisPubSub,
   ) {}
 
   @Mutation(() => Group)
@@ -76,6 +79,13 @@ export class GroupsResolver {
     return this.groupsService.remove(user.userId, groupId);
   }
 
+  // Subscriptions
+  @Subscription(() => Message)
+  newMessage() {
+    return this.pubSub.asyncIterator('newMessage');
+  }
+
+  // Field resolver
   // use groupService for querying creator user as its an unidirectional relation
   @ResolveField(() => User, { nullable: true })
   async creator(@Parent() group: Group): Promise<User> {

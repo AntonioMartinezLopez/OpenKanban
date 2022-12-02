@@ -367,3 +367,7 @@ input UpdateTasklogInput {
   exampleField: Int
   id: Int!
 }
+
+type Subscription {
+  newMessage: Message!
+}

@@ -1,5 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { GroupsService } from 'src/groups/groups.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
@@ -16,6 +17,7 @@ export class MessageService {
     private userService: UserService,
     @Inject(GroupsService)
     private groupService: GroupsService,
+    @Inject('PUB_SUB') private pubSub: RedisPubSub,
   ) {}
 
   async create(createMessageInput: CreateMessageInput) {
@@ -36,6 +38,9 @@ export class MessageService {
     newMessage.text = createMessageInput.text;
     newMessage.creator = user;
     newMessage.group = group;
+
+    // publish to subscribers of the group
+    this.pubSub.publish('newMessage', { newMessage: newMessage });
 
     return this.messageRepository.save(newMessage);
   }

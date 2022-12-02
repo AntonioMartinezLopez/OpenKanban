@@ -23,8 +23,8 @@ import { Task } from './task/entities/task.entity';
 import { Label } from './label/entities/label.entity';
 import { Message } from './message/entities/message.entity';
 import {} from 'graphql-ws';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
-import Redis from 'ioredis';
+import { PubSubModule } from './pubSub/pubSub.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -48,6 +48,7 @@ import Redis from 'ioredis';
       cors: { origin: true, credentials: true },
       subscriptions: {
         'graphql-ws': true,
+        'subscriptions-transport-ws': true,
       },
     }),
     AuthModule,
@@ -59,24 +60,25 @@ import Redis from 'ioredis';
     MessageModule,
     TasklogModule,
     BoardcolumnModule,
+    PubSubModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: 'PUB_SUB',
-      useFactory: () => {
-        const options = {
-          host: 'redis',
-          port: 6379,
-        };
+    // {
+    //   provide: 'PUB_SUB',
+    //   useFactory: () => {
+    //     const options = {
+    //       host: 'redis',
+    //       port: 6379,
+    //     };
 
-        return new RedisPubSub({
-          publisher: new Redis(options),
-          subscriber: new Redis(options),
-        });
-      },
-    },
+    //     return new RedisPubSub({
+    //       publisher: new Redis(options),
+    //       subscriber: new Redis(options),
+    //     });
+    //   },
+    // },
   ],
 })
 export class AppModule {}
