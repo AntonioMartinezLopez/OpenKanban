@@ -80,8 +80,13 @@ export class GroupsResolver {
   }
 
   // Subscriptions
-  @Subscription(() => Message)
-  newMessage() {
+  @Subscription(() => [Message], {
+    filter(payload, variables) {
+      return variables.groupId === payload.newMessage.group.id;
+    },
+  })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  newMessage(@Args('groupId') groupId: string) {
     return this.pubSub.asyncIterator('newMessage');
   }
 

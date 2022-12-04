@@ -369,5 +369,5 @@ input UpdateTasklogInput {
 }
 
 type Subscription {
-  newMessage: Message!
+  newMessage(groupId: String!): [Message!]!
 }

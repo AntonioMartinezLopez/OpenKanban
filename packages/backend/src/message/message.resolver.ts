@@ -31,4 +31,6 @@ export class MessageResolver {
   removeMessage(@Args('id', { type: () => String }) messageId: string) {
     return this.messageService.remove(messageId);
   }
+
+  //resolve functions
 }
