@@ -80,13 +80,23 @@ export class GroupsResolver {
   }
 
   // Subscriptions
-  @Subscription(() => [Message], {
+  @Subscription(() => Message, {
     filter(payload, variables) {
-      return variables.groupId === payload.newMessage.group.id;
+      console.error(payload);
+      return (variables.groups as string[]).includes(
+        payload.newMessage.group.id,
+      );
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  newMessage(@Args('groupId') groupId: string) {
+  newMessage(
+    @Args({
+      name: 'groups',
+      type: () => [String],
+      description:
+        'An array of groupId whose groups should be subscribed for new messages',
+    })
+    groups: string[],
+  ) {
     return this.pubSub.asyncIterator('newMessage');
   }
 

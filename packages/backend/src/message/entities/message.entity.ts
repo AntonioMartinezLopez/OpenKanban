@@ -19,6 +19,7 @@ export class Message {
   id: string;
 
   @CreateDateColumn()
+  @Field({ description: 'Timestamp for creation of message' })
   created: Date;
 
   @UpdateDateColumn()

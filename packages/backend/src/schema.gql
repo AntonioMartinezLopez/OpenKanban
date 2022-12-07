@@ -58,9 +58,19 @@ type Message {
   """Message Id"""
   id: String!
 
+  """Timestamp for creation of message"""
+  created: DateTime!
+
   """The content of the message"""
   text: String!
+  creator: User
+  group: Group
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Group {
   """Group Id"""
@@ -369,5 +379,8 @@ input UpdateTasklogInput {
 }
 
 type Subscription {
-  newMessage(groupId: String!): [Message!]!
+  newMessage(
+    """An array of groupId whose groups should be subscribed for new messages"""
+    groups: [String!]!
+  ): Message!
 }
