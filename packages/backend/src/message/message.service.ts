@@ -39,10 +39,10 @@ export class MessageService {
     newMessage.creator = user;
     newMessage.group = group;
 
+    const savedMessage = await this.messageRepository.save(newMessage);
     // publish to subscribers of the group
-    this.pubSub.publish('newMessage', { newMessage: newMessage });
-
-    return this.messageRepository.save(newMessage);
+    this.pubSub.publish('newMessage', { newMessage: savedMessage });
+    return savedMessage;
   }
 
   findAll(groupId: string) {
