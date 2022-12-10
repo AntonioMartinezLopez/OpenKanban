@@ -1,4 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
+import { Role } from 'src/auth/roles/role.enum';
 import { Group } from 'src/groups/entities/group.entity';
 import { Task } from 'src/task/entities/task.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -20,6 +21,9 @@ export class User {
 
   @Column('text')
   password: string;
+
+  @Column({ type: 'enum', enum: Role, default: Role.User })
+  role: Role;
 
   @Column('simple-array')
   refreshToken?: string[];

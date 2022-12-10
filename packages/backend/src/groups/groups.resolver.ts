@@ -19,6 +19,9 @@ import { UserService } from 'src/user/user.service';
 import { Board } from 'src/board/entities/board.entity';
 import { Message } from 'src/message/entities/message.entity';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { Role } from 'src/auth/roles/role.enum';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
 
 @Resolver(() => Group)
 export class GroupsResolver {
@@ -49,6 +52,8 @@ export class GroupsResolver {
     return this.groupsService.removeUser(groupId, userId);
   }
 
+  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @Roles(Role.User)
   @Query(() => [Group], { name: 'groups' })
   findAll() {
     return this.groupsService.findAll();
@@ -92,8 +97,7 @@ export class GroupsResolver {
     @Args({
       name: 'groups',
       type: () => [String],
-      description:
-        'An array of groupId whose groups should be subscribed for new messages',
+      description: 'array of subscribed groups',
     })
     groups: string[],
   ) {

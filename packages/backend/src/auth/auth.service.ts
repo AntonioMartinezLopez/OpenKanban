@@ -66,10 +66,11 @@ export class AuthService {
     const accessToken = this.jwtService.sign({
       username: user.username,
       userId: user.userId,
+      role: user.role,
     });
 
     const newRefreshToken = this.jwtService.sign(
-      { userId: user.userId, username: user.username },
+      { userId: user.userId, username: user.username, role: user.role },
       { expiresIn: '1d' },
     );
 
@@ -259,6 +260,7 @@ export class AuthService {
       const accessToken = this.jwtService.sign({
         username: foundUser.username,
         userId: foundUser.userId,
+        role: foundUser.role,
       });
 
       //generate new refresh token
@@ -266,6 +268,7 @@ export class AuthService {
         {
           username: foundUser.username,
           userId: foundUser.userId,
+          role: foundUser.role,
         },
         { expiresIn: '1d' },
       );

@@ -15,6 +15,10 @@ import { GqlJwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { GroupsService } from 'src/groups/groups.service';
 import { Group } from 'src/groups/entities/group.entity';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { Role } from 'src/auth/roles/role.enum';
+import { OwnGuard } from './guards/own.guard';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -46,8 +50,9 @@ export class UserResolver {
     return this.userService.findOneById(user.userId);
   }
 
+  @UseGuards(GqlJwtAuthGuard, RolesGuard, OwnGuard)
+  @Roles(Role.Admin, Role.User)
   @Mutation(() => User)
-  @UseGuards(GqlJwtAuthGuard)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.userService.update(updateUserInput);
   }

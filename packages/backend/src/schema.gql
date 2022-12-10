@@ -375,7 +375,7 @@ input UpdateTasklogInput {
 
 type Subscription {
   newMessage(
-    """An array of groupId whose groups should be subscribed for new messages"""
+    """array of subscribed groups"""
     groups: [String!]!
   ): Message!
 }
