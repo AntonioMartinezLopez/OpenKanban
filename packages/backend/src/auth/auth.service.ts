@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import Ctx from 'src/types/context.types';
 import { User } from 'src/user/entities/user.entity';
@@ -29,6 +29,12 @@ export class AuthService {
       });
 
     return validToken;
+  }
+
+  validateToken(authToken: string): any {
+    return this.jwtService.decode(authToken);
+
+    throw new ForbiddenException('invalid access token');
   }
 
   async validateUser(username: string, pass: string): Promise<User | null> {

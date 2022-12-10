@@ -24,6 +24,7 @@ import { Label } from './label/entities/label.entity';
 import { Message } from './message/entities/message.entity';
 import {} from 'graphql-ws';
 import { PubSubModule } from './pubSub/pubSub.module';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -37,19 +38,66 @@ import { PubSubModule } from './pubSub/pubSub.module';
       entities: [User, Group, Board, Boardcolumn, Task, Label, Message],
       synchronize: true,
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+      //import AuthModule for JWT headers at graphql subscriptions
+      imports: [AuthModule],
+      //inject Auth Service
+      inject: [AuthService],
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      debug: true,
-      playground: { settings: { 'request.credentials': 'include' } },
-      context: ({ req, res }): { req: Request; res: Response } => {
-        return { req, res };
-      },
-      cors: { origin: true, credentials: true },
-      subscriptions: {
-        'graphql-ws': true,
-        'subscriptions-transport-ws': true,
-      },
+      useFactory: async (authService: AuthService) => ({
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+        debug: true,
+        playground: { settings: { 'request.credentials': 'include' } },
+        context: ({
+          req,
+          res,
+          connection,
+          extra,
+        }): {
+          req: Request;
+          res: Response;
+          connection: any;
+          extra: any;
+        } => {
+          return { req, res, connection, extra };
+        },
+        cors: { origin: true, credentials: true },
+        subscriptions: {
+          'graphql-ws': true,
+          'subscriptions-transport-ws': {
+            onConnect: (connectionParams) => {
+              console.error('CONNECTION PARAMS', connectionParams);
+
+              // convert header keys to lowercase
+              const connectionParamsLowerKeys = Object.fromEntries(
+                Object.entries(connectionParams).map(([k, v]) => [
+                  k.toLowerCase(),
+                  v,
+                ]),
+              );
+              // get authToken from authorization header
+              let authToken: string | false = false;
+
+              const val = connectionParamsLowerKeys['authorization'];
+              if (val != null && typeof val === 'string') {
+                authToken = val.split(' ')[1];
+              }
+              console.error('AUTH TOKEN:', authToken);
+              if (authToken) {
+                // verify authToken/getJwtPayLoad
+                const jwtPayload = authService.validateToken(authToken);
+
+                // the user/jwtPayload object found will be available as context.currentUser/jwtPayload in GraphQL resolvers
+                return {
+                  currentUser: jwtPayload.username,
+                  jwtPayload,
+                  headers: connectionParamsLowerKeys,
+                };
+              }
+            },
+          },
+        },
+      }),
     }),
     AuthModule,
     UserModule,
