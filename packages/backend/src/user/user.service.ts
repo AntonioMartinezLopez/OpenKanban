@@ -1,11 +1,15 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput, UpdateUserInputAuth } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
-
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -63,24 +67,56 @@ export class UserService {
     // .where(":refreshToken = ANY ( string_to_array(user.refreshToken, ','))", { refreshToken: refreshToken })
   }
 
+  async findAllUserFromGroup(groupId: string): Promise<User[]> {
+    return this.usersRepository.find({
+      relations: ['groups'],
+      where: { groups: { id: groupId } },
+    });
+  }
+
   // U for UPDATE
   async update(updateUserInput: UpdateUserInput): Promise<User> {
-    try {
-      //hash password
-      updateUserInput.password = await bcrypt.hash(
-        updateUserInput.password,
-        10,
-      );
-
-      await this.usersRepository.update(
-        { userId: updateUserInput.userId },
-        { ...updateUserInput },
-      );
-
-      return this.usersRepository.findOneBy({ userId: updateUserInput.userId });
-    } catch (e) {
-      throw new ForbiddenException(e);
+    // hash new password if given
+    if (updateUserInput.password) {
+      try {
+        //hash password
+        updateUserInput.password = await bcrypt.hash(
+          updateUserInput.password,
+          10,
+        );
+      } catch (e) {
+        throw new ForbiddenException(e);
+      }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userId, ...data } = updateUserInput;
+
+    let user = await this.usersRepository.findOneBy({
+      userId: userId,
+    });
+
+    // throw error when no user could be found
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // check if new username is planned to be given and check whether name already exists
+    if (
+      updateUserInput.username &&
+      user.username !== updateUserInput.username
+    ) {
+      const foundUser = await this.usersRepository.findOneBy({
+        username: updateUserInput.username,
+      });
+      if (foundUser) {
+        throw new ForbiddenException('Username already exists');
+      }
+    }
+
+    user = { ...user, ...data };
+
+    return this.usersRepository.save(user);
   }
 
   // internal function
@@ -97,7 +133,7 @@ export class UserService {
   async remove(id: string): Promise<User> {
     const user = await this.findOneById(id);
     if (user) {
-      this.usersRepository.remove(user);
+      return this.usersRepository.remove(user);
     }
     throw new ForbiddenException('User id is unknown!');
   }

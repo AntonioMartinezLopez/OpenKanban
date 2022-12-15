@@ -2,6 +2,86 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Task {
+  """Task Id"""
+  id: String!
+
+  """The name of the task"""
+  name: String!
+
+  """Description of the task"""
+  description: String!
+
+  """Calculated weight of a task"""
+  weight: Int!
+  assignees: [User!]!
+}
+
+type Boardcolumn {
+  """Column Id"""
+  id: String!
+
+  """The name of the Column"""
+  name: String!
+
+  """Maximum weight the column can hold"""
+  maxWeight: Int!
+  tasks: [Task!]!
+}
+
+type Label {
+  """Label Id"""
+  id: String!
+
+  """The name of the label"""
+  name: String!
+
+  """Color of the label"""
+  color: String!
+}
+
+type Board {
+  """Board id"""
+  id: String!
+
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+  columns: [Boardcolumn!]!
+  tasks: [Task!]!
+  labels: [Label!]!
+}
+
+type Message {
+  """Message Id"""
+  id: String!
+
+  """Timestamp for creation of message"""
+  created: String
+
+  """The content of the message"""
+  text: String!
+  creator: User
+  group: Group
+}
+
+type Group {
+  """Group Id"""
+  id: String!
+
+  """The name of the group"""
+  name: String!
+
+  """Description of the group"""
+  description: String!
+  creator: User
+  users: [User!]
+  board: Board
+  messages: [Message!]!
+}
+
 type User {
   """UserId"""
   userId: String!
@@ -11,11 +91,17 @@ type User {
 
   """The email of the user"""
   email: String!
+  groups: [Group!]!
 }
 
 type LoginResult {
   """Example field (placeholder)"""
   access_token: String!
+}
+
+type Tasklog {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 type Query {
@@ -25,6 +111,15 @@ type Query {
   users: [User!]!
   user(id: String!): User!
   whoAmI: User!
+  groups: [Group!]!
+  group(id: String, name: String): Group
+  boards: [Board!]!
+  board(id: String!): Board!
+  task(id: String!): Task!
+  boardcolumn(id: String!): Boardcolumn!
+  label(id: String!): Label!
+  message(groupId: String!): [Message!]!
+  tasklog(id: Int!): Tasklog!
 }
 
 input LoginUserInput {
@@ -38,7 +133,30 @@ input LoginUserInput {
 type Mutation {
   register(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: String!): User!
+  removeUser: User!
+  createGroup(createGroupInput: CreateGroupInput!): Group!
+  addUserToGroup(groupId: String!, userId: String!): Group!
+  removeUserFromGroup(groupId: String!, userId: String!): Group!
+  updateGroup(updateGroupInput: UpdateGroupInput!): Group!
+  removeGroup(groupId: String!): Group!
+  createBoard(createBoardInput: CreateBoardInput!): Board!
+  updateBoard(updateBoardInput: UpdateBoardInput!): Board!
+  removeBoard(id: String!): Board!
+  createTask(createTaskInput: CreateTaskInput!): Task!
+  updateTask(updateTaskInput: UpdateTaskInput!): Task!
+  removeTask(id: String!): Task!
+  createBoardcolumn(createBoardcolumnInput: CreateBoardcolumnInput!): Boardcolumn!
+  updateBoardcolumn(updateBoardcolumnInput: UpdateBoardcolumnInput!): Boardcolumn!
+  removeBoardcolumn(id: String!): Boardcolumn!
+  createLabel(createLabelInput: CreateLabelInput!): Label!
+  updateLabel(updateLabelInput: UpdateLabelInput!): Label!
+  removeLabel(id: String!): Label!
+  createMessage(createMessageInput: CreateMessageInput!): Message!
+  updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  removeMessage(id: String!): Message!
+  createTasklog(createTasklogInput: CreateTasklogInput!): Tasklog!
+  updateTasklog(updateTasklogInput: UpdateTasklogInput!): Tasklog!
+  removeTasklog(id: Int!): Tasklog!
 }
 
 input CreateUserInput {
@@ -54,12 +172,210 @@ input CreateUserInput {
 
 input UpdateUserInput {
   """Field for name of the new user"""
-  username: String!
+  username: String
 
   """Field for the email address of the new user"""
-  email: String!
+  email: String
 
   """Field for the password of the new user"""
-  password: String!
+  password: String
   userId: String!
+}
+
+input CreateGroupInput {
+  """The name of the group"""
+  name: String!
+
+  """Description of the group"""
+  description: String!
+
+  """First user and creator of the group"""
+  userId: String!
+
+  """The name of the board"""
+  boardname: String
+
+  """The description of the board"""
+  boardDescription: String
+}
+
+input UpdateGroupInput {
+  """The name of the group"""
+  name: String
+
+  """Description of the group"""
+  description: String
+
+  """First user and creator of the group"""
+  userId: String
+
+  """The name of the board"""
+  boardname: String
+
+  """The description of the board"""
+  boardDescription: String
+
+  """The id of the group"""
+  id: String!
+}
+
+input CreateBoardInput {
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+
+  """Group Id"""
+  groupId: String!
+}
+
+input UpdateBoardInput {
+  """The name of the board"""
+  name: String!
+
+  """The desciription of the user"""
+  description: String!
+
+  """Group Id"""
+  groupId: String
+
+  """Id of the board"""
+  id: String!
+}
+
+input CreateTaskInput {
+  """The name of the task"""
+  name: String!
+
+  """Description of the task"""
+  description: String!
+
+  """Calculated weight of a task"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String!
+
+  """Board Id"""
+  assignees: [String!]!
+}
+
+input UpdateTaskInput {
+  """The name of the task"""
+  name: String!
+
+  """Description of the task"""
+  description: String!
+
+  """Calculated weight of a task"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String
+
+  """Board Id"""
+  assignees: [String!]!
+
+  """Task Id"""
+  id: String!
+
+  """Calculated weight of a task"""
+  weight: Int!
+
+  """BoardColumn Id"""
+  boardColumnId: String
+}
+
+input CreateBoardcolumnInput {
+  """The name of the Column"""
+  name: String!
+
+  """Maximum weight of tasks"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String!
+}
+
+input UpdateBoardcolumnInput {
+  """The name of the Column"""
+  name: String!
+
+  """Maximum weight of tasks"""
+  maxWeight: Int
+
+  """Board Id"""
+  boardId: String
+
+  """BoardColumn Id"""
+  id: String!
+}
+
+input CreateLabelInput {
+  """The name of the label"""
+  name: String!
+
+  """color of the label"""
+  color: String!
+
+  """id of the corresponding board"""
+  boardId: String!
+}
+
+input UpdateLabelInput {
+  """The name of the label"""
+  name: String!
+
+  """color of the label"""
+  color: String!
+
+  """id of the corresponding board"""
+  boardId: String
+
+  """id of the label"""
+  labelId: String!
+}
+
+input CreateMessageInput {
+  """The content of the message"""
+  text: String!
+
+  """The creator of the message """
+  creatorId: String!
+
+  """The id of the group"""
+  groupId: String!
+}
+
+input UpdateMessageInput {
+  """the text of the message"""
+  text: String!
+
+  """The creator of the message """
+  creatorId: String
+
+  """The id of the group"""
+  groupId: String
+
+  """The id of the updating message"""
+  messageId: String!
+}
+
+input CreateTasklogInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTasklogInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+type Subscription {
+  newMessage(
+    """array of subscribed groups"""
+    groups: [String!]!
+  ): Message!
 }

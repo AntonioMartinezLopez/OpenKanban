@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import Ctx from 'src/types/context.types';
 import { User } from 'src/user/entities/user.entity';
@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { LoginResult } from './dto/login-result';
 import { LoginUserInput } from './dto/login-user.input';
 import * as bcrypt from 'bcryptjs';
+import { AuthenticationError } from 'apollo-server-express';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,30 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
+
+  isTokenValid(token: string): boolean {
+    let validToken = false;
+    this.jwtService
+      .verifyAsync(token)
+      .then(() => {
+        validToken = true;
+      })
+      .catch(() => {
+        this.logger.error('INVALID TOKEN');
+        validToken = false;
+      });
+
+    return validToken;
+  }
+
+  validateToken(authToken: string): any {
+    try {
+      const decodedToken = this.jwtService.verify(authToken);
+      return decodedToken;
+    } catch (error) {
+      throw new ForbiddenException('invalid access token');
+    }
+  }
 
   async validateUser(username: string, pass: string): Promise<User | null> {
     const user = await this.userService.findOneByName(username);
@@ -41,24 +66,29 @@ export class AuthService {
     );
 
     if (!user) {
-      return null;
+      throw new AuthenticationError(
+        'Could not log-in with the provided credentials',
+      );
     }
 
     // create JWT
     const accessToken = this.jwtService.sign({
       username: user.username,
       userId: user.userId,
+      role: user.role,
     });
 
     const newRefreshToken = this.jwtService.sign(
-      { userId: user.userId, username: user.username },
+      { userId: user.userId, username: user.username, role: user.role },
       { expiresIn: '1d' },
     );
 
-    // load the refreshtoken array
+    // load the refreshtoken array and check also for invalid tokens
     const newRefreshTokenArray = !cookies?.jwt
-      ? user.refreshToken
-      : user.refreshToken.filter((rt) => rt !== cookies.jwt);
+      ? user.refreshToken.filter((rt) => this.isTokenValid(rt))
+      : user.refreshToken.filter(
+          (rt) => rt !== cookies.jwt || this.isTokenValid(rt),
+        );
 
     //Before adding to response, check if cookies containing jwt is used by other users
     /* 
@@ -179,7 +209,7 @@ export class AuthService {
     // load cookie from request
     const refreshToken = context.req.cookies.jwt;
     if (!refreshToken) {
-      return null;
+      throw new AuthenticationError('invalid or missing refresh token');
     }
 
     //delete cookie
@@ -217,7 +247,7 @@ export class AuthService {
           this.logger.error('ERROR: ' + err);
           //return null;
         });
-      return null;
+      throw new AuthenticationError('refresh token reuse detected');
     }
 
     let newRefreshTokenArray = foundUser.refreshToken.filter(
@@ -239,6 +269,7 @@ export class AuthService {
       const accessToken = this.jwtService.sign({
         username: foundUser.username,
         userId: foundUser.userId,
+        role: foundUser.role,
       });
 
       //generate new refresh token
@@ -246,6 +277,7 @@ export class AuthService {
         {
           username: foundUser.username,
           userId: foundUser.userId,
+          role: foundUser.role,
         },
         { expiresIn: '1d' },
       );
@@ -280,7 +312,7 @@ export class AuthService {
         userId: foundUser.userId,
         refreshToken: [...newRefreshTokenArray],
       });
-      return null;
+      throw new AuthenticationError('invalid refresh token');
     }
   }
 }
