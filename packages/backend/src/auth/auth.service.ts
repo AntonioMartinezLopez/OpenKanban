@@ -32,9 +32,12 @@ export class AuthService {
   }
 
   validateToken(authToken: string): any {
-    return this.jwtService.decode(authToken);
-
-    throw new ForbiddenException('invalid access token');
+    try {
+      const decodedToken = this.jwtService.verify(authToken);
+      return decodedToken;
+    } catch (error) {
+      throw new ForbiddenException('invalid access token');
+    }
   }
 
   async validateUser(username: string, pass: string): Promise<User | null> {

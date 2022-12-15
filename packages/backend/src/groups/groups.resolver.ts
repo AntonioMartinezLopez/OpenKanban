@@ -87,7 +87,6 @@ export class GroupsResolver {
   // Subscriptions
   @Subscription(() => Message, {
     filter(payload, variables) {
-      console.error(payload);
       return (variables.groups as string[]).includes(
         payload.newMessage.group.id,
       );

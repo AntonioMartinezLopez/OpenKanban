@@ -22,7 +22,7 @@ import { Boardcolumn } from './boardcolumn/entities/boardcolumn.entity';
 import { Task } from './task/entities/task.entity';
 import { Label } from './label/entities/label.entity';
 import { Message } from './message/entities/message.entity';
-import {} from 'graphql-ws';
+import { Context } from 'graphql-ws';
 import { PubSubModule } from './pubSub/pubSub.module';
 import { AuthService } from './auth/auth.service';
 
@@ -63,10 +63,11 @@ import { AuthService } from './auth/auth.service';
         },
         cors: { origin: true, credentials: true },
         subscriptions: {
-          'graphql-ws': true,
-          'subscriptions-transport-ws': {
-            onConnect: (connectionParams) => {
-              console.error('CONNECTION PARAMS', connectionParams);
+          'graphql-ws': {
+            onConnect: (context: Context<any>) => {
+              const { connectionParams, extra } = context;
+              // user validation will remain the same as in the example above
+              // when using with graphql-ws, additional context value should be stored in the extra field
 
               // convert header keys to lowercase
               const connectionParamsLowerKeys = Object.fromEntries(
@@ -82,7 +83,35 @@ import { AuthService } from './auth/auth.service';
               if (val != null && typeof val === 'string') {
                 authToken = val.split(' ')[1];
               }
-              console.error('AUTH TOKEN:', authToken);
+              if (authToken) {
+                // verify authToken/getJwtPayLoad
+                const jwtPayload = authService.validateToken(authToken);
+
+                (extra as any).user = {
+                  currentUser: jwtPayload.username,
+                  jwtPayload,
+                  headers: connectionParamsLowerKeys,
+                };
+              }
+            },
+          },
+
+          'subscriptions-transport-ws': {
+            onConnect: (connectionParams) => {
+              // convert header keys to lowercase
+              const connectionParamsLowerKeys = Object.fromEntries(
+                Object.entries(connectionParams).map(([k, v]) => [
+                  k.toLowerCase(),
+                  v,
+                ]),
+              );
+              // get authToken from authorization header
+              let authToken: string | false = false;
+
+              const val = connectionParamsLowerKeys['authorization'];
+              if (val != null && typeof val === 'string') {
+                authToken = val.split(' ')[1];
+              }
               if (authToken) {
                 // verify authToken/getJwtPayLoad
                 const jwtPayload = authService.validateToken(authToken);
