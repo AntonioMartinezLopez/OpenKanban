@@ -10,7 +10,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./test/appdata/redis/data:/data
+      #      - ./test/appdata/redis/data:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
   backend:
