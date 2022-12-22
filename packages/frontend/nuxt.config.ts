@@ -14,4 +14,16 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
   },
+  devServer: {
+    port: 8000,
+  },
+  vite: {
+    server: {
+      hmr: {
+        protocol: "ws",
+        port: process.env.HMR_PORT ? parseInt(process.env.HMR_PORT) : 8001,
+        host: "0.0.0.0",
+      },
+    },
+  },
 });
