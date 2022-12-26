@@ -14,12 +14,6 @@ services:
       environment:
         PORT: 3000
         HMR_PORT: 3001
-      #   EXPOSE_PORT: 3001
-        # DATABASE_HOST: db
-        # DATABASE_PORT: 5432
-        # DATABASE_NAME: kanban
-        # DATABASE_USER: root
-        # DATABASE_PASSWORD: root
 ### backend ###
   redis:
     container_name: redis
@@ -50,7 +44,6 @@ services:
       DATABASE_NAME: kanban
       DATABASE_USER: root
       DATABASE_PASSWORD: root
-
   db:
     image: postgres
     restart: always

@@ -7,16 +7,16 @@ export default defineNuxtConfig({
   apollo: {
     clients: {
       default: {
-        httpEndpoint: "https://api.spacex.land/graphql",
+        httpEndpoint: "backend:3002/graphql",
       },
     },
   },
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
   },
-  devServer: {
-    port: 8000,
-  },
+  // app: {
+  //   baseURL: "/Login",
+  // },
   vite: {
     server: {
       hmr: {
