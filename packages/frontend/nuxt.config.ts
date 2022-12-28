@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   alias: {
     pinia: "/node_modules/@pinia/nuxt/node_modules/pinia/dist/pinia.mjs",
   },
+
   apollo: {
     clients: {
       default: {
@@ -13,10 +14,20 @@ export default defineNuxtConfig({
   },
   tailwindcss: {
     cssPath: "~/assets/css/tailwind.css",
+    config: {
+      theme: {
+        minHeight: {
+          loginBox: "200px",
+        },
+      },
+    },
   },
-  // app: {
-  //   baseURL: "/Login",
-  // },
+  app: {
+    head: {
+      script: [{ src: "/js/three.min.js" }],
+    },
+    // baseURL: "/Login",
+  },
   vite: {
     server: {
       hmr: {
