@@ -48,6 +48,7 @@
 
 <script setup lang="ts">
 import NET from "vanta/dist/vanta.net.min";
+import { graphql } from "../gql";
 definePageMeta({ layout: "unlogged" });
 
 const username = ref("");
@@ -76,9 +77,33 @@ onMounted(() => {
   });
 });
 
-const sendLoggingData = () => {
+const sendLoggingData = async () => {
+  // const query = gql`
+  //   query ($username: String!, $email: String!, $password: String!) {
+  //     register(username: $username, email: $email, password: $password) {
+  //       userId
+  //       username
+  //       email
+  //     }
+  //   }
+  // `;
+  const query = graphql(`
+    query login($username: String!, $password: String!) {
+      login(loginUserInput: { username: $username, password: $password }) {
+        access_token
+      }
+    }
+  `);
+
+  const variables = { username: username.value, password: password.value };
+  const { data, error } = await useAsyncQuery(query, variables);
+
+  const token = data.value?.login.access_token;
+
   // eslint-disable-next-line no-console
-  console.log(username, password);
+  console.log(token);
+  // eslint-disable-next-line no-console
+  console.log(error);
 };
 </script>
 

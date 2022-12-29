@@ -4,10 +4,11 @@ services:
   frontend:
       image: node:current-alpine3.16
       container_name: frontend
-      command: npm run dev
+      command: npm run dev:gql
       working_dir: /var/app/frontend
       volumes:
         - ./packages/frontend:/var/app/frontend
+        - ./packages/backend:/var/app/backend
       ports:
         - 3000:3000
         - 3001:3001
