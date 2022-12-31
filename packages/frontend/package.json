@@ -3,7 +3,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "dev:gql": "graphql-codegen --watch & nuxt dev" ,
+    "dev:gql": "graphql-codegen --watch & nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.6",
+    "jwt-decode": "^3.1.2",
     "vanta": "^0.5.24"
   }
 }

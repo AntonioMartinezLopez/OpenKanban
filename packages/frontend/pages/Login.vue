@@ -39,6 +39,7 @@
         <div
           class="row-span-2 w-5/6 m-auto text-center text-xs flex flex-col justify-center items-center"
         >
+          {{ errorMessage }}
           Please contact your admin, if you forgot your login credentials
         </div>
       </div>
@@ -48,11 +49,19 @@
 
 <script setup lang="ts">
 import NET from "vanta/dist/vanta.net.min";
+import jwtDecode from "jwt-decode";
 import { graphql } from "../gql";
+import { useAuth } from "@/stores/AuthStore";
+
+// call hooks
+const { onLogin } = useApollo();
+const authStore = useAuth();
+
 definePageMeta({ layout: "unlogged" });
 
 const username = ref("");
 const password = ref("");
+const errorMessage = ref("");
 
 // wait until mounted
 const loaded = ref(false);
@@ -100,10 +109,21 @@ const sendLoggingData = async () => {
 
   const token = data.value?.login.access_token;
 
-  // eslint-disable-next-line no-console
-  console.log(token);
-  // eslint-disable-next-line no-console
-  console.log(error);
+  if (token) {
+    // save new token in apollo client
+    onLogin(token);
+
+    // save user info in store
+    authStore.setSession(jwtDecode(token));
+    authStore.setUserToken(token);
+
+    // navigate to welcome page
+    navigateTo("/welcome");
+  }
+
+  if (error && error.value?.message) {
+    errorMessage.value = error.value?.message;
+  }
 };
 </script>
 
