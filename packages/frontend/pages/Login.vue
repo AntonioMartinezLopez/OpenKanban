@@ -39,7 +39,12 @@
         <div
           class="row-span-2 w-5/6 m-auto text-center text-xs flex flex-col justify-center items-center"
         >
-          {{ errorMessage }}
+          <div
+            class="text-red-600 min-h-full h-full w-full text-xs flex flex-col items-center justify-start"
+          >
+            {{ errorMessage ? errorMessage : "&nbsp;" }}
+          </div>
+          <br />
           Please contact your admin, if you forgot your login credentials
         </div>
       </div>
@@ -53,10 +58,6 @@ import jwtDecode from "jwt-decode";
 import { graphql } from "../gql";
 import { useAuth } from "@/stores/AuthStore";
 
-// call hooks
-const { onLogin } = useApollo();
-const authStore = useAuth();
-
 definePageMeta({ layout: "unlogged" });
 
 const username = ref("");
@@ -68,25 +69,30 @@ const loaded = ref(false);
 onMounted(() => {
   setTimeout(() => {
     loaded.value = true;
-  }, 300);
+  }, 500);
 
-  NET({
-    el: "#loginWindow",
-    mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.0,
-    minWidth: 200.0,
-    scale: 1.0,
-    scaleMobile: 1.0,
-    color: 0x34d399,
-    backgroundColor: 0x111827,
-    points: 7.0,
-    spacing: 25.0,
-  });
+  setTimeout(() => {
+    NET({
+      el: "#loginWindow",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.0,
+      minWidth: 200.0,
+      scale: 1.0,
+      scaleMobile: 1.0,
+      color: 0x34d399,
+      backgroundColor: 0x111827,
+      points: 7.0,
+      spacing: 25.0,
+    });
+  }, 300);
 });
 
 const sendLoggingData = async () => {
+  // call hooks
+  const { onLogin } = useApollo();
+  const authStore = useAuth();
   // const query = gql`
   //   query ($username: String!, $email: String!, $password: String!) {
   //     register(username: $username, email: $email, password: $password) {

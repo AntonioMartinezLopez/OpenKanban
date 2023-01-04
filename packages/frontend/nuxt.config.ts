@@ -11,11 +11,14 @@ export default defineNuxtConfig({
       "acceptHMRUpdate",
     ],
   },
-
+  ssr: false,
   apollo: {
     clients: {
       default: {
         httpEndpoint: "http://localhost:3002/graphql",
+        httpLinkOptions: {
+          credentials: "include",
+        },
       },
     },
   },
