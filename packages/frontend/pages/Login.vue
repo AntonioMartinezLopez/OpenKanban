@@ -7,9 +7,9 @@
       <div class="h-full w-full grid grid-flow-row grid-rows-7 min-h-full">
         <div class="row-span-2 w-4/6 m-auto">
           <div
-            class="h-full text-xl font-semibold flex flex-col justify-center items-start"
+            class="h-full text-xl font-semibold flex flex-row justify-center items-start"
           >
-            OpenKanban - Log In
+            <img class="h-full" src="@/assets/openkanban_logo_mono_green.png" />
           </div>
         </div>
         <div class="row-span-1 text-center w-4/6 m-auto">

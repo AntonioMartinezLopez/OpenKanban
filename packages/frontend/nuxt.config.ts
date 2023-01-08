@@ -29,6 +29,11 @@ export default defineNuxtConfig({
         minHeight: {
           loginBox: "200px",
         },
+        extend: {
+          gridRow: {
+            "span-8": "span 8 / span 8",
+          },
+        },
       },
     },
   },
