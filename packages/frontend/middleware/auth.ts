@@ -1,28 +1,48 @@
+import jwtDecode from "jwt-decode";
+import { graphql } from "../gql";
 import { useAuth } from "@/stores/AuthStore";
 
-export default defineNuxtRouteMiddleware((_to, _from) => {
-  // first: check if there is an active user in the store
+export default defineNuxtRouteMiddleware(async (_to, _from) => {
   const authStore = useAuth();
-  const session = authStore.getUserSession;
-  // if a user is in store check for validity of current access_token
-  if (session.userId) {
-    const currentTime = new Date().getTime() / 1000;
-    // if expiration date was surpassed try to refresh, else redirect to login
-    if (currentTime > session.exp) {
+  const { getToken, onLogin } = useApollo();
+  // const session = authStore.getUserSession;
+
+  // load current set token
+  const token: string | undefined = await getToken();
+  // if there exists a access token in the cookies, verify whether it is valid
+  const validToken = !!(token && isTokenValid(token));
+
+  if (!validToken) {
+    // try to refresh the access token with a possibly existing refresh token in cookies
+    const query = graphql(`
+      query refreshToken {
+        refreshToken {
+          access_token
+        }
+      }
+    `);
+
+    const { data, error } = await useAsyncQuery(query, {});
+    // eslint-disable-next-line no-console
+    console.log("DATA: ", data);
+    // eslint-disable-next-line no-console
+    console.log("ERROR", error);
+
+    // if refreshing access token was succesful, save new session and continue
+    if (data.value?.refreshToken) {
+      const newAccessToken = data.value.refreshToken.access_token;
+      // save new token in apollo client
+      onLogin(newAccessToken);
+
+      // save user info in store
+      authStore.setSession(jwtDecode(newAccessToken));
+      authStore.setUserToken(newAccessToken);
+    }
+
+    // if refreshing token return an error, reset the store and navigate to login
+    if (error.value) {
+      authStore.resetStore();
       return navigateTo("/login");
     }
-    // if no user is in store check if cooke is still valid
-  } else {
-    // test
   }
-  // isAuthenticated() is an example method verifying if an user is authenticated
-  // const { getToken } = useApollo();
-  // const token = await getToken();
-  // if (token) {
-  //   console.log(token);
-  // }
-  // // token.then((te) => console.log(te));
-  //   if (isAuthenticated() === false) {
-  //     return navigateTo("/login");
-  //   }
 });

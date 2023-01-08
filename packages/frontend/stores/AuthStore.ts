@@ -23,6 +23,10 @@ export const useAuth = defineStore("AuthStore", {
     setUserToken(newToken: string) {
       this.userToken = newToken;
     },
+    resetStore() {
+      this.userSession = {} as userSession;
+      this.userToken = "";
+    },
   },
 });
 
