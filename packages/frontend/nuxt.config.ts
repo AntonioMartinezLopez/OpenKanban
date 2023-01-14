@@ -33,6 +33,9 @@ export default defineNuxtConfig({
           gridRow: {
             "span-8": "span 8 / span 8",
           },
+          transitionProperty: {
+            height: "height",
+          },
         },
       },
     },
