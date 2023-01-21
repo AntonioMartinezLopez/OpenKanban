@@ -7,6 +7,7 @@
     >
       <div
         class="overflow-hidden col-span-2 md:col-span-1 flex flex-col justify-center items-start ml-2"
+        @click="toggleSideMenu"
       >
         <img class="h-full" src="@/assets/openkanban_logo.png" />
       </div>
@@ -22,14 +23,15 @@
       <div class="col-span-1 flex flex-col justify-center items-end mr-6">
         <div
           class="w-7 h-7 rounded-full bg-slate-500 flex flex-col justify-center items-center cursor-pointer border border-slate-500 hover:border-green-500"
+          @click="setLogOut"
         >
           JD
         </div>
       </div>
     </header>
     <div class="flex-1 flex flex-row overflow-y-auto">
-      <LayoutSideMenu></LayoutSideMenu>
-      <div class="flex-1"><slot></slot></div>
+      <LayoutSideMenu :display="sideMenuOpen"></LayoutSideMenu>
+      <div class="flex-1 overflow-hidden"><slot></slot></div>
     </div>
 
     <!-- <footer class="h-10 ml-auto text-sm fixed bottom-0 left-1/2">
@@ -37,3 +39,17 @@
     </footer> -->
   </div>
 </template>
+
+<script setup lang="ts">
+import { logOut } from "~~/utils/LoginFunctions";
+// SITE MENU
+const sideMenuOpen = ref<boolean>(true);
+
+const toggleSideMenu = () => {
+  sideMenuOpen.value = !sideMenuOpen.value;
+};
+
+const setLogOut = () => {
+  logOut();
+};
+</script>

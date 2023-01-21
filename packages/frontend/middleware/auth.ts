@@ -23,10 +23,6 @@ export default defineNuxtRouteMiddleware(async (_to, _from) => {
     `);
 
     const { data, error } = await useAsyncQuery(query, {});
-    // eslint-disable-next-line no-console
-    console.log("DATA: ", data);
-    // eslint-disable-next-line no-console
-    console.log("ERROR", error);
 
     // if refreshing access token was succesful, save new session and continue
     if (data.value?.refreshToken) {
@@ -40,7 +36,7 @@ export default defineNuxtRouteMiddleware(async (_to, _from) => {
     }
 
     // if refreshing token return an error, reset the store and navigate to login
-    if (error.value) {
+    if (error) {
       authStore.resetStore();
       return navigateTo("/login");
     }

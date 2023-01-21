@@ -31,7 +31,7 @@
         <div class="row-span-1 text-center w-4/6 m-auto">
           <button
             class="w-full h-9 bg-green-600 text-center font-bold rounded-sm"
-            @click="sendLoggingData"
+            @click="sendLoginData"
           >
             Login
           </button>
@@ -54,9 +54,6 @@
 
 <script setup lang="ts">
 import NET from "vanta/dist/vanta.net.min";
-import jwtDecode from "jwt-decode";
-import { graphql } from "../gql";
-import { useAuth } from "@/stores/AuthStore";
 
 definePageMeta({ layout: "unlogged" });
 
@@ -89,46 +86,17 @@ onMounted(() => {
   }, 300);
 });
 
-const sendLoggingData = async () => {
-  // call hooks
-  const { onLogin } = useApollo();
-  const authStore = useAuth();
-  // const query = gql`
-  //   query ($username: String!, $email: String!, $password: String!) {
-  //     register(username: $username, email: $email, password: $password) {
-  //       userId
-  //       username
-  //       email
-  //     }
-  //   }
-  // `;
-  const query = graphql(`
-    query login($username: String!, $password: String!) {
-      login(loginUserInput: { username: $username, password: $password }) {
-        access_token
-      }
-    }
-  `);
+const sendLoginData = async () => {
+  // call log in function
+  const { token, error } = await logIn(username.value, password.value);
 
-  const variables = { username: username.value, password: password.value };
-  const { data, error } = await useAsyncQuery(query, variables);
-
-  const token = data.value?.login.access_token;
-
+  // if log in was successfull, fetch user relevant data and redirect to welcome page
   if (token) {
-    // save new token in apollo client
-    onLogin(token);
-
-    // save user info in store
-    authStore.setSession(jwtDecode(token));
-    authStore.setUserToken(token);
-
-    // navigate to welcome page
-    navigateTo("/welcome");
+    navigateTo("/overview");
   }
 
-  if (error && error.value?.message) {
-    errorMessage.value = error.value?.message;
+  if (error) {
+    errorMessage.value = error.message;
   }
 };
 </script>

@@ -1,8 +1,9 @@
 <template>
   <div
-    class="bg-gray-800 subpixel-antialiased w-52 border-slate-700 border-r p-2"
+    class="bg-gray-800 subpixel-antialiased border-slate-700 border-r p-2 transition-all duration-200"
+    :class="props.display ? 'w-full md:w-56 visible' : 'w-0 collapse'"
   >
-    <div class="h-full w-full flex flex-col">
+    <div v-if="display" class="h-full w-full flex flex-col">
       <div class="h-14 border-b border-b-slate-600">
         <div class="h-3/6 text-lg flex flex-col">John Doe</div>
         <div class="h-3/6 p-0 flex flex-row justify-start items-center">
@@ -31,7 +32,9 @@
             <rect x="3" y="14" width="7" height="7" />
           </svg>
 
-          <span class="ml-2">Overview</span>
+          <span class="ml-2">
+            <NuxtLink to="/Overview">Overview</NuxtLink>
+          </span>
         </div>
         <div class="flex-grow flex flex-col gap-3">
           <div
@@ -72,19 +75,24 @@
           </div>
 
           <div class="flex-grow flex flex-col gap-2">
-            <!-- TEST GROUP1 -->
-
             <div
+              v-for="group in groups"
+              :key="group.id"
               class="pl-2 h-5 transition-all duration-600 overflow-hidden"
               :class="{
                 ['bg-slate-700 rounded-md h-[7.5rem]']:
                   selectedElement.eventType === 'group' &&
-                  selectedElement.id === '1',
+                  selectedElement.id === group.id,
               }"
             >
               <div
                 class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
-                @click="selectElement({ eventType: 'group', id: '1' })"
+                @click="
+                  selectElement({
+                    eventType: 'group',
+                    id: group.id,
+                  })
+                "
               >
                 <svg
                   class="h-4 w-4 text-inherit"
@@ -99,136 +107,45 @@
                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <span class="ml-2">Group 1</span>
+                <span class="ml-2">{{ group.name }}</span>
               </div>
 
               <div class="pl-8 mt-1 flex flex-col gap-1">
                 <div
                   class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  :class="{
+                    'text-green-500':
+                      groupRoute === group.id && groupElement === 'team',
+                  }"
                 >
-                  Team
+                  <NuxtLink :to="`/group-${group.id}/team`">Team</NuxtLink>
                 </div>
                 <div
                   class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  :class="{
+                    'text-green-500':
+                      groupRoute === group.id && groupElement === 'chat',
+                  }"
                 >
-                  Chat
+                  <NuxtLink :to="`/group-${group.id}/chat`">Chat</NuxtLink>
                 </div>
                 <div
                   class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  :class="{
+                    'text-green-500':
+                      groupRoute === group.id && groupElement === 'tasks',
+                  }"
                 >
-                  Tasks
+                  <NuxtLink :to="`/group-${group.id}/tasks`">Tasks</NuxtLink>
                 </div>
                 <div
                   class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  :class="{
+                    'text-green-500':
+                      groupRoute === group.id && groupElement === 'board',
+                  }"
                 >
-                  Board
-                </div>
-              </div>
-            </div>
-            <!-- TEST GROUP2 -->
-
-            <div
-              class="pl-2 h-5 transition-all duration-600 overflow-hidden"
-              :class="{
-                ['bg-slate-700 rounded-md h-32']:
-                  selectedElement.eventType === 'group' &&
-                  selectedElement.id === '2',
-              }"
-            >
-              <div
-                class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
-                @click="selectElement({ eventType: 'group', id: '2' })"
-              >
-                <svg
-                  class="h-4 w-4 text-inherit"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                <span class="ml-2">Group 2</span>
-              </div>
-
-              <div class="pl-8 mt-1 flex flex-col gap-2">
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Team
-                </div>
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Chat
-                </div>
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Tasks
-                </div>
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Board
-                </div>
-              </div>
-            </div>
-
-            <!-- TEST GROUP3 -->
-
-            <div
-              class="pl-2 h-5 transition-all duration-600 overflow-hidden"
-              :class="{
-                ['bg-slate-700 rounded-md h-32']:
-                  selectedElement.eventType === 'group' &&
-                  selectedElement.id === '3',
-              }"
-            >
-              <div
-                class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
-                @click="selectElement({ eventType: 'group', id: '3' })"
-              >
-                <svg
-                  class="h-4 w-4 text-inherit"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                <span class="ml-2">Group 3</span>
-              </div>
-
-              <div class="pl-8 mt-1 flex flex-col gap-2">
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Team
-                </div>
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Chat
-                </div>
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Tasks
-                </div>
-                <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
-                >
-                  Board
+                  <NuxtLink :to="`/group-${group.id}/board`">Board</NuxtLink>
                 </div>
               </div>
             </div>
@@ -353,12 +270,25 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { graphql } from "~~/gql/gql";
+import { useUserStore } from "~~/stores/UserStore";
+
+const props = defineProps({
+  display: { type: Boolean, required: true },
+});
+
+// ---------------- Logic for menu selection -------------------------------------
+// -------------------------------------------------------------------------------
 interface SelectEvent {
   eventType: "group" | "chat" | "";
   id: string;
 }
 
-const selectedElement = ref<SelectEvent>({ eventType: "", id: "" });
+const selectedElement = ref<SelectEvent>({
+  eventType: "",
+  id: "",
+});
 
 function selectElement(newSelectEvent: SelectEvent) {
   if (
@@ -370,6 +300,60 @@ function selectElement(newSelectEvent: SelectEvent) {
     selectedElement.value = { eventType: "", id: "" };
   }
 }
+
+const route = useRoute();
+const groupRoute = computed(() => {
+  return route.params.groupid ? (route.params.groupid as string) : "";
+});
+const groupElement = computed(() => {
+  // determine which part of a group was selected
+  return route.path.split("/").pop();
+});
+watch(
+  () => route.params.groupid,
+  () => {
+    selectedElement.value.eventType = "group";
+    selectedElement.value.id = route.params.groupid as string;
+  }
+);
+// ---------------- Logic for menu selection -------------------------------------
+// -------------------------------------------------------------------------------
+//
+//
+// ---------------- Load data from store -----------------------------------------
+// -------------------------------------------------------------------------------
+const userStore = storeToRefs(useUserStore());
+const groups = computed(() => {
+  return userStore.groups.value;
+});
+// ---------------- Load data from store -----------------------------------------
+// -------------------------------------------------------------------------------
+//
+//
+// ---------------- Life cycle methods -------------------------------------------
+// -------------------------------------------------------------------------------
+onBeforeMount(async () => {
+  // load relevant information
+  const query = graphql(`
+    query whoaAmI {
+      whoAmI {
+        email
+        username
+        userId
+        groups {
+          id
+          name
+        }
+      }
+    }
+  `);
+
+  const result = await sendQuery(query, {});
+  if (result.value) {
+    const userStore = useUserStore();
+    userStore.setUserStore(result.value);
+  }
+});
 </script>
 
 <style>
