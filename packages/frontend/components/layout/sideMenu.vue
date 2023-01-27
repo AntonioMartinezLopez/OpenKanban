@@ -1,21 +1,21 @@
 <template>
   <div
-    class="bg-gray-800 subpixel-antialiased border-slate-700 border-r p-2 transition-all duration-200"
-    :class="props.display ? 'w-full md:w-56 visible' : 'w-0 collapse'"
+    class="h-full border-r border-slate-700 bg-gray-800 p-2 subpixel-antialiased transition-all duration-200"
+    :class="props.display ? 'visible w-full md:w-56' : 'collapse w-0'"
   >
-    <div v-if="display" class="h-full w-full flex flex-col">
+    <div v-if="display" class="flex h-full w-full flex-col">
       <div class="h-14 border-b border-b-slate-600">
-        <div class="h-3/6 text-lg flex flex-col">John Doe</div>
-        <div class="h-3/6 p-0 flex flex-row justify-start items-center">
+        <div class="flex h-3/6 flex-col text-lg">John Doe</div>
+        <div class="flex h-3/6 flex-row items-center justify-start p-0">
           Online
-          <span class="w-2 h-2 ml-2 rounded-full bg-green-400"></span>
+          <span class="ml-2 h-2 w-2 rounded-full bg-green-400"></span>
         </div>
       </div>
       <div
-        class="h-[50%] min-h-[50%] max-h-[50%] overflow-y-auto flex flex-col gap-1 border-b border-b-slate-600"
+        class="flex h-[50%] max-h-[50%] min-h-[50%] flex-col gap-1 overflow-y-auto border-b border-b-slate-600"
       >
         <div
-          class="min-h-10 h-12 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500 font-bold"
+          class="min-h-10 flex h-12 cursor-pointer flex-row items-center justify-start text-base font-bold hover:text-green-500"
         >
           <svg
             class="h-4 w-4 text-inherit"
@@ -36,9 +36,9 @@
             <NuxtLink to="/Overview">Overview</NuxtLink>
           </span>
         </div>
-        <div class="flex-grow flex flex-col gap-3">
+        <div class="flex flex-grow flex-col gap-3">
           <div
-            class="text-base flex flex-row justify-start items-center font-bold"
+            class="flex flex-row items-center justify-start text-base font-bold"
           >
             <svg
               class="h-4 w-4 text-inherit"
@@ -54,39 +54,41 @@
               />
             </svg>
             <span class="ml-2">Groups</span>
-            <div class="flex flex-col justify-center cursor-pointer ml-auto">
-              <svg
-                class="h-5 w-5 text-inherit hover:text-green-500"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="2"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" />
-                <circle cx="12" cy="12" r="9" />
-                <line x1="9" y1="12" x2="15" y2="12" />
-                <line x1="12" y1="9" x2="12" y2="15" />
-              </svg>
+            <div class="ml-auto flex cursor-pointer flex-col justify-center">
+              <NuxtLink :to="`/creategroup`"
+                ><svg
+                  class="h-5 w-5 text-inherit hover:text-green-500"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" />
+                  <circle cx="12" cy="12" r="9" />
+                  <line x1="9" y1="12" x2="15" y2="12" />
+                  <line x1="12" y1="9" x2="12" y2="15" />
+                </svg>
+              </NuxtLink>
             </div>
           </div>
 
-          <div class="flex-grow flex flex-col gap-2">
+          <div class="flex flex-grow flex-col gap-2">
             <div
               v-for="group in groups"
               :key="group.id"
-              class="pl-2 h-5 transition-all duration-600 overflow-hidden"
+              class="duration-600 h-5 overflow-hidden pl-2 transition-all"
               :class="{
-                ['bg-slate-700 rounded-md h-[7.5rem]']:
+                ['h-[7.5rem] rounded-md bg-slate-700']:
                   selectedElement.eventType === 'group' &&
                   selectedElement.id === group.id,
               }"
             >
               <div
-                class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
+                class="flex h-5 cursor-pointer flex-row items-center justify-start text-base hover:text-green-500"
                 @click="
                   selectElement({
                     eventType: 'group',
@@ -110,9 +112,9 @@
                 <span class="ml-2">{{ group.name }}</span>
               </div>
 
-              <div class="pl-8 mt-1 flex flex-col gap-1">
+              <div class="mt-1 flex flex-col gap-1 pl-8">
                 <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  class="text-md flex h-5 cursor-pointer flex-col justify-center hover:text-green-500"
                   :class="{
                     'text-green-500':
                       groupRoute === group.id && groupElement === 'team',
@@ -121,7 +123,7 @@
                   <NuxtLink :to="`/group-${group.id}/team`">Team</NuxtLink>
                 </div>
                 <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  class="text-md flex h-5 cursor-pointer flex-col justify-center hover:text-green-500"
                   :class="{
                     'text-green-500':
                       groupRoute === group.id && groupElement === 'chat',
@@ -130,7 +132,7 @@
                   <NuxtLink :to="`/group-${group.id}/chat`">Chat</NuxtLink>
                 </div>
                 <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  class="text-md flex h-5 cursor-pointer flex-col justify-center hover:text-green-500"
                   :class="{
                     'text-green-500':
                       groupRoute === group.id && groupElement === 'tasks',
@@ -139,7 +141,7 @@
                   <NuxtLink :to="`/group-${group.id}/tasks`">Tasks</NuxtLink>
                 </div>
                 <div
-                  class="h-5 flex flex-col justify-center text-md cursor-pointer hover:text-green-500"
+                  class="text-md flex h-5 cursor-pointer flex-col justify-center hover:text-green-500"
                   :class="{
                     'text-green-500':
                       groupRoute === group.id && groupElement === 'board',
@@ -152,10 +154,10 @@
           </div>
         </div>
       </div>
-      <div class="min-h-[25%] flex-1 overflow-scroll">
-        <div class="flex-grow flex flex-col gap-2">
+      <div class="min-h-[25%] flex-1 overflow-y-auto">
+        <div class="flex flex-grow flex-col gap-2">
           <div
-            class="text-base flex flex-row justify-start items-center font-bold pt-2"
+            class="flex flex-row items-center justify-start pt-2 text-base font-bold"
           >
             <svg
               class="h-4 w-4 text-inherit"
@@ -176,7 +178,7 @@
               <line x1="8" y1="13" x2="14" y2="13" />
             </svg>
             <span class="ml-2"> Messages</span>
-            <div class="flex flex-col justify-center cursor-pointer ml-auto">
+            <div class="ml-auto flex cursor-pointer flex-col justify-center">
               <svg
                 class="h-5 w-5 text-inherit hover:text-green-500"
                 width="24"
@@ -198,15 +200,15 @@
 
           <!-- TEST MESSAGE 1 -->
           <div
-            class="pl-2 h-5 transition-all duration-600 overflow-hidden"
+            class="duration-600 h-5 overflow-hidden pl-2 transition-all"
             :class="{
-              ['bg-slate-700 rounded-md']:
+              ['rounded-md bg-slate-700']:
                 selectedElement.eventType === 'chat' &&
                 selectedElement.id === '1',
             }"
           >
             <div
-              class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
+              class="flex h-5 cursor-pointer flex-row items-center justify-start text-base hover:text-green-500"
               @click="selectElement({ eventType: 'chat', id: '1' })"
             >
               <span class="ml-4">Ian Burgess</span>
@@ -215,15 +217,15 @@
 
           <!-- TEST MESSAGE 2 -->
           <div
-            class="pl-2 h-5 transition-all duration-600 overflow-hidden"
+            class="duration-600 h-5 overflow-hidden pl-2 transition-all"
             :class="{
-              ['bg-slate-700 rounded-md']:
+              ['rounded-md bg-slate-700']:
                 selectedElement.eventType === 'chat' &&
                 selectedElement.id === '2',
             }"
           >
             <div
-              class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
+              class="flex h-5 cursor-pointer flex-row items-center justify-start text-base hover:text-green-500"
               @click="selectElement({ eventType: 'chat', id: '2' })"
             >
               <span class="ml-4">Dylan Pullman</span>
@@ -232,15 +234,15 @@
 
           <!-- TEST MESSAGE 3 -->
           <div
-            class="pl-2 h-5 transition-all duration-600 overflow-hidden"
+            class="duration-600 h-5 overflow-hidden pl-2 transition-all"
             :class="{
-              ['bg-slate-700 rounded-md']:
+              ['rounded-md bg-slate-700']:
                 selectedElement.eventType === 'chat' &&
                 selectedElement.id === '3',
             }"
           >
             <div
-              class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
+              class="flex h-5 cursor-pointer flex-row items-center justify-start text-base hover:text-green-500"
               @click="selectElement({ eventType: 'chat', id: '3' })"
             >
               <span class="ml-4">Adam Baker</span>
@@ -249,15 +251,15 @@
 
           <!-- TEST MESSAGE 4 -->
           <div
-            class="pl-2 h-5 transition-all duration-600 overflow-hidden"
+            class="duration-600 h-5 overflow-hidden pl-2 transition-all"
             :class="{
-              ['bg-slate-700 rounded-md']:
+              ['rounded-md bg-slate-700']:
                 selectedElement.eventType === 'chat' &&
                 selectedElement.id === '4',
             }"
           >
             <div
-              class="h-5 flex flex-row justify-start items-center text-base cursor-pointer hover:text-green-500"
+              class="flex h-5 cursor-pointer flex-row items-center justify-start text-base hover:text-green-500"
               @click="selectElement({ eventType: 'chat', id: '4' })"
             >
               <span class="ml-4">Abigail Walsh</span>

@@ -1,15 +1,15 @@
 <template>
-  <div class="w-full h-11 bg-inherit rounded-md relative">
+  <div class="relative h-10 w-full rounded-md bg-inherit">
     <label
-      class="absolute h-full w-full z-10 bg-transparent pl-1 text-left transition-all duration-300 flex flex-col justify-center"
-      :class="{ 'text-xs -translate-y-3': focused || modelValue }"
+      class="absolute z-10 flex h-full w-full flex-col justify-center bg-transparent pl-1 text-left transition-all duration-300"
+      :class="{ '-translate-y-3 text-xs text-gray-400': focused || modelValue }"
       @click.stop="focused = !focused"
       >{{ label }}</label
     >
     <input
       ref="inputRef"
       :type="inputType"
-      class="w-full h-full bg-gray-600 border border-transparent rounded-sm focus:border-1 focus:border-green-400 focus:outline-none pl-1"
+      class="focus:border-1 h-full w-full rounded-sm border border-transparent bg-gray-600 pl-1 focus:border-green-400 focus:outline-none"
       :class="{ 'pt-3': focused || modelValue }"
       :value="modelValue"
       :tabindex="tabindex"

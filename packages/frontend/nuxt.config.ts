@@ -27,9 +27,13 @@ export default defineNuxtConfig({
     config: {
       theme: {
         minHeight: {
-          loginBox: "200px",
+          loginBox: "300px",
         },
         extend: {
+          gridTemplateRows: {
+            // Simple 8 row grid
+            "8": "repeat(8, minmax(0, 1fr))",
+          },
           gridRow: {
             "span-8": "span 8 / span 8",
           },

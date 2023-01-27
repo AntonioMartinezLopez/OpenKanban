@@ -1,37 +1,37 @@
 <template>
   <div
-    class="h-screen min-h-[350px] flex flex-col bg-gray-900 text-zinc-300 text-sm"
+    class="flex h-screen min-h-[350px] flex-col bg-gray-900 bg-gradient-to-b from-gray-900 to-slate-800 text-sm text-zinc-300"
   >
     <header
-      class="h-12 bg-gray-800 subpixel-antialiased grid grid-cols-6 border-slate-700 border-b"
+      class="grid h-12 grid-cols-6 border-b border-slate-700 bg-gray-800 subpixel-antialiased"
     >
       <div
-        class="overflow-hidden col-span-2 md:col-span-1 flex flex-col justify-center items-start ml-2"
+        class="col-span-2 ml-2 flex flex-col items-start justify-center overflow-hidden md:col-span-1"
         @click="toggleSideMenu"
       >
         <img class="h-full" src="@/assets/openkanban_logo.png" />
       </div>
       <div
-        class="hidden md:flex col-span-1 flex-col justify-center items-start"
+        class="col-span-1 hidden flex-col items-start justify-center md:flex"
       >
         Company Name
       </div>
-      <div class="col-span-2 flex flex-col justify-center items-center">
-        <input class="rounded-md w-full" />
+      <div class="col-span-2 flex flex-col items-center justify-center">
+        <input class="w-full rounded-md" />
       </div>
       <div class="col-span-1"></div>
-      <div class="col-span-1 flex flex-col justify-center items-end mr-6">
+      <div class="col-span-1 mr-6 flex flex-col items-end justify-center">
         <div
-          class="w-7 h-7 rounded-full bg-slate-500 flex flex-col justify-center items-center cursor-pointer border border-slate-500 hover:border-green-500"
+          class="flex h-7 w-7 cursor-pointer flex-col items-center justify-center rounded-full border border-slate-500 bg-slate-500 hover:border-green-500"
           @click="setLogOut"
         >
           JD
         </div>
       </div>
     </header>
-    <div class="flex-1 flex flex-row overflow-y-auto">
+    <div class="flex flex-1 flex-row overflow-y-auto">
       <LayoutSideMenu :display="sideMenuOpen"></LayoutSideMenu>
-      <div class="flex-1 overflow-hidden"><slot></slot></div>
+      <div class="flex flex-1 overflow-hidden"><slot></slot></div>
     </div>
 
     <!-- <footer class="h-10 ml-auto text-sm fixed bottom-0 left-1/2">

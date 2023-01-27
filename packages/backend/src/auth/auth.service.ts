@@ -80,7 +80,7 @@ export class AuthService {
 
     const newRefreshToken = this.jwtService.sign(
       { userId: user.userId, username: user.username, role: user.role },
-      { expiresIn: '12h', notBefore: '12h' },
+      { expiresIn: '12h' },
     );
 
     // load the refreshtoken array and check also for invalid tokens

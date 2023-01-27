@@ -35,6 +35,10 @@ export class GroupsService {
     // find creator of group und set him as first user within group
     const user = await this.userService.findOneById(createGroupInput.userId);
 
+    if (!user) {
+      throw new NotFoundException('Unknown user Id');
+    }
+
     const newGroup = new Group();
     newGroup.name = createGroupInput.name;
     newGroup.description = createGroupInput.description;

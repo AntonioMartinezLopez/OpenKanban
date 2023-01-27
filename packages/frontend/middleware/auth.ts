@@ -33,6 +33,7 @@ export default defineNuxtRouteMiddleware(async (_to, _from) => {
       // save user info in store
       authStore.setSession(jwtDecode(newAccessToken));
       authStore.setUserToken(newAccessToken);
+      return;
     }
 
     // if refreshing token return an error, reset the store and navigate to login

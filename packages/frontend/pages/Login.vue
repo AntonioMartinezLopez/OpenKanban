@@ -1,18 +1,18 @@
 <template>
-  <div id="loginWindow" class="h-full p-10 flex">
+  <div id="loginWindow" class="flex h-full p-10">
     <div
-      class="container flex relative right-40 opacity-0 m-auto bg-gray-800 border-green-400 border shadow-2xl shadow-green-400/20 rounded-md lg:w-2/6 lg:h-3/6 h-3/6 w-4/5 min-h-loginBox transition-all duration-500"
-      :class="{ 'right-0': loaded, 'opacity-100': loaded }"
+      class="min-h-loginBox container relative right-40 m-auto flex h-3/6 w-4/5 rounded-md border border-green-400 bg-gray-800 shadow-2xl shadow-green-400/20 transition-all duration-500 lg:h-3/6 lg:w-2/6"
+      :class="[loaded ? 'right-0 opacity-100' : 'opacity-0']"
     >
-      <div class="h-full w-full grid grid-flow-row grid-rows-7 min-h-full">
-        <div class="row-span-2 w-4/6 m-auto">
+      <div class="grid-rows-7 grid h-full min-h-full w-full grid-flow-row">
+        <div class="row-span-2 m-auto w-4/6">
           <div
-            class="h-full text-xl font-semibold flex flex-row justify-center items-start"
+            class="flex h-full flex-row items-start justify-center text-xl font-semibold"
           >
             <img class="h-full" src="@/assets/openkanban_logo_mono_green.png" />
           </div>
         </div>
-        <div class="row-span-1 text-center w-4/6 m-auto">
+        <div class="row-span-1 m-auto w-4/6 text-center">
           <InputField
             v-model="username"
             label="Username"
@@ -20,7 +20,7 @@
             :tabindex="1"
           ></InputField>
         </div>
-        <div class="row-span-1 text-center w-4/6 m-auto">
+        <div class="row-span-1 m-auto w-4/6 text-center">
           <InputField
             v-model="password"
             label="Password"
@@ -28,19 +28,19 @@
             :tabindex="2"
           ></InputField>
         </div>
-        <div class="row-span-1 text-center w-4/6 m-auto">
+        <div class="row-span-1 m-auto w-4/6 text-center">
           <button
-            class="w-full h-9 bg-green-600 text-center font-bold rounded-sm"
+            class="h-9 w-full rounded-sm bg-green-600 text-center font-bold"
             @click="sendLoginData"
           >
             Login
           </button>
         </div>
         <div
-          class="row-span-2 w-5/6 m-auto text-center text-xs flex flex-col justify-center items-center"
+          class="row-span-2 m-auto flex w-5/6 flex-col items-center justify-center text-center text-xs"
         >
           <div
-            class="text-red-600 min-h-full h-full w-full text-xs flex flex-col items-center justify-start"
+            class="flex h-full min-h-full w-full flex-col items-center justify-start text-xs text-red-600"
           >
             {{ errorMessage ? errorMessage : "&nbsp;" }}
           </div>
