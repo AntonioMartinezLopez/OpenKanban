@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   forwardRef,
   Inject,
@@ -13,7 +14,7 @@ import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateGroupInput } from './dto/create-group.input';
 import { UpdateGroupInput } from './dto/update-group.input';
 import { Group } from './entities/group.entity';
@@ -29,27 +30,57 @@ export class GroupsService {
     private userService: UserService,
     @Inject(BoardService)
     private boardService: BoardService,
+    private dataSource: DataSource,
   ) {}
 
   async create(createGroupInput: CreateGroupInput): Promise<Group> {
-    // find creator of group und set him as first user within group
-    const user = await this.userService.findOneById(createGroupInput.userId);
+    // start transaction
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    let savedGroup = {} as Group;
 
-    const newGroup = new Group();
-    newGroup.name = createGroupInput.name;
-    newGroup.description = createGroupInput.description;
-    newGroup.users = [user];
-    newGroup.creator = user;
+    try {
+      // find creator of group und set him as first user within group
+      const user = await this.userService.findOneById(createGroupInput.userId);
 
-    // direct initialization of a board
-    if (createGroupInput.boardname && createGroupInput.boardDescription) {
-      const newBoard = new Board();
-      newBoard.name = createGroupInput.boardname;
-      newBoard.description = createGroupInput.boardDescription;
-      newGroup.board = newBoard;
+      if (!user) {
+        throw new NotFoundException('Unknown user Id');
+      }
+
+      const newGroup = new Group();
+      newGroup.name = createGroupInput.name;
+      newGroup.description = createGroupInput.description;
+      newGroup.users = [user];
+      newGroup.creator = user;
+
+      // direct initialization of a board
+      if (createGroupInput.boardname && createGroupInput.boardDescription) {
+        const newBoard = new Board();
+        newBoard.name = createGroupInput.boardname;
+        newBoard.description = createGroupInput.boardDescription;
+        newGroup.board = newBoard;
+      }
+
+      savedGroup = await this.groupRepository.save(newGroup);
+
+      // add users to new group if given
+      if (createGroupInput.users) {
+        createGroupInput.users.forEach(async (userId) => {
+          savedGroup = await this.addUser(savedGroup.id, userId);
+        });
+      }
+
+      await queryRunner.commitTransaction();
+      return savedGroup;
+    } catch (err) {
+      // since we have errors lets rollback the changes we made
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException(err);
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await queryRunner.release();
     }
-
-    return this.groupRepository.save(newGroup);
   }
 
   async addUser(groupdId: string, userId: string): Promise<Group> {

@@ -80,7 +80,7 @@ export class AuthService {
 
     const newRefreshToken = this.jwtService.sign(
       { userId: user.userId, username: user.username, role: user.role },
-      { expiresIn: '1d' },
+      { expiresIn: '12h' },
     );
 
     // load the refreshtoken array and check also for invalid tokens
@@ -152,7 +152,7 @@ export class AuthService {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 12 * 60 * 60 * 1000,
     });
 
     return {
@@ -279,7 +279,7 @@ export class AuthService {
           userId: foundUser.userId,
           role: foundUser.role,
         },
-        { expiresIn: '1d' },
+        { expiresIn: '12h' },
       );
 
       const result = await this.userService.updateTokens({
@@ -300,7 +300,7 @@ export class AuthService {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000,
+        maxAge: 12 * 60 * 60 * 1000,
       });
 
       //return access token
