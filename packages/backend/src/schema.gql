@@ -197,26 +197,20 @@ input CreateGroupInput {
 
   """The description of the board"""
   boardDescription: String
+
+  """users of the group"""
+  users: [String!]!
 }
 
 input UpdateGroupInput {
+  """The id of the group"""
+  id: String!
+
   """The name of the group"""
   name: String
 
   """Description of the group"""
   description: String
-
-  """First user and creator of the group"""
-  userId: String
-
-  """The name of the board"""
-  boardname: String
-
-  """The description of the board"""
-  boardDescription: String
-
-  """The id of the group"""
-  id: String!
 }
 
 input CreateBoardInput {

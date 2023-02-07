@@ -40,6 +40,7 @@
       >
         <h3 class="w-full text-lg">Description</h3>
         <textarea
+          v-model="descriptionInput"
           class="duration-400 w-full flex-1 resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
           tabindex="1"
           type="text"
@@ -52,22 +53,27 @@
         <h3 class="w-full text-lg">Add Members</h3>
         <input
           v-model="searchedMember"
-          class="duration-400 h-7 w-60 resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+          class="duration-400 h-7 w-72 resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
           tabindex="1"
           type="text"
           @focus="opened = true"
-          @blur="opened = false"
+          @blur="
+            () => {
+              opened = false;
+              searchedMember = '';
+            }
+          "
         />
         <div class="relative w-full flex-1">
           <div
-            class="duration-400 absolute z-20 flex h-full w-60 flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
+            class="duration-400 absolute z-20 flex h-full w-72 flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
             :class="
               opened
                 ? 'visible top-0 opacity-100'
                 : 'invisible -top-4 opacity-0'
             "
           >
-            <div v-for="user in users" :key="user.userId">
+            <div v-for="user in filteredMemberList" :key="user.userId">
               <div
                 class="flex h-11 w-full border-b border-gray-500 bg-gray-800 pl-4 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:bg-gray-700"
                 @click="addOrRemoveUser(user)"
@@ -105,11 +111,11 @@
             </div>
           </div>
           <div
-            class="flex h-full w-full flex-row items-center justify-start gap-2"
+            class="flex h-full max-h-36 w-full flex-row flex-wrap items-center justify-start gap-2 overflow-y-scroll pt-2"
           >
             <!-- USER CARD - TO BE EXTRCATED -->
             <div
-              class="grid h-10 w-32 grid-cols-6 rounded-md border border-gray-500 bg-gray-800 shadow-md shadow-gray-700/40"
+              class="grid h-10 w-36 grid-cols-6 rounded-md border border-gray-500 bg-gray-800 shadow-md shadow-gray-700/40"
             >
               <div class="col-span-2 flex flex-col items-end justify-center">
                 <div
@@ -128,7 +134,7 @@
             <div
               v-for="user in selectedMembers"
               :key="user.userId"
-              class="grid h-10 w-32 grid-cols-6 rounded-md border border-gray-500 bg-gray-800 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:border-red-500 hover:bg-gray-700"
+              class="grid h-10 w-36 grid-cols-6 rounded-md border border-gray-500 bg-gray-800 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:border-red-500 hover:bg-gray-700"
               @click="addOrRemoveUser(user)"
             >
               <div class="col-span-2 flex flex-col items-end justify-center">
@@ -139,7 +145,7 @@
                 </div>
               </div>
               <div
-                class="col-span-4 flex flex-row items-center justify-start overflow-hidden"
+                class="col-span-4 flex flex-row items-center justify-start gap-0 overflow-hidden"
               >
                 {{ user.username }}
               </div>
@@ -150,11 +156,18 @@
       <div
         class="row-span-1 mr-2 flex h-full w-full flex-row items-center justify-end gap-7"
       >
-        <button class="h-8 w-16 rounded-md bg-red-500 text-slate-100">
+        <button
+          class="h-8 w-16 rounded-md bg-red-500 text-slate-100 hover:bg-red-600"
+        >
           Abort
         </button>
         <button
-          class="h-8 w-24 rounded-md bg-green-600 text-slate-100 hover:bg-green-700"
+          class="h-8 w-24 rounded-md bg-green-600 text-slate-100 transition-all duration-300 ease-in hover:bg-green-700"
+          :class="{
+            'pointer-events-none cursor-not-allowed opacity-25':
+              groupAlreadyExists || !descriptionInput,
+          }"
+          @click="submitInput"
         >
           Save Group
         </button>
@@ -166,6 +179,8 @@
 <script setup lang="ts">
 import { graphql } from "~~/gql/gql";
 import { User } from "~~/gql/graphql";
+import { useUserStore } from "~~/stores/UserStore";
+import { sendQuery } from "~~/utils/dataFetching";
 
 const opened = ref(false);
 
@@ -201,13 +216,16 @@ const users = userData.value ? userData.value.users : [];
 //
 // ----------------- HANDLE INPUT---------------------------//
 
-// Group name
+// 1: Group name
 const groupNameInput = ref("");
 const groupAlreadyExists = computed(() => {
   return groupNames.includes(groupNameInput.value);
 });
 
-// selected members
+// 2: description input
+const descriptionInput = ref("");
+
+// 3:  selected members
 const searchedMember = ref("");
 const selectedMembers = ref<Partial<User>[]>([]);
 
@@ -232,5 +250,58 @@ const addOrRemoveUser = (user: Partial<User>) => {
   }
 };
 
+const filteredMemberList = computed(() => {
+  if (searchedMember.value !== "") {
+    return users.filter((user) => {
+      return (
+        user.email.toLowerCase().includes(searchedMember.value.toLowerCase()) ||
+        (user.username
+          .toLowerCase()
+          .includes(searchedMember.value.toLowerCase()) &&
+          user.userId !== userStore.userId)
+      );
+    });
+  }
+  return users.filter((user) => user.userId !== userStore.userId);
+});
 // ----------------- HANDLE INPUT---------------------------//
+//
+// ----------------- USER DATA---------------------------//
+const userStore = useUserStore();
+// ----------------- USER DATA---------------------------//
+//
+// ----------------- SUBMIT INPUT---------------------------//
+const submitInput = async () => {
+  const createGroupQuery = graphql(`
+    mutation createGroup(
+      $name: String!
+      $description: String!
+      $userId: String!
+      $users: [String!]!
+    ) {
+      createGroup(
+        createGroupInput: {
+          name: $name
+          description: $description
+          userId: $userId
+          users: $users
+        }
+      ) {
+        id
+      }
+    }
+  `);
+  const createdGroup = await sendQuery(createGroupQuery, {
+    name: groupNameInput.value,
+    description: descriptionInput.value,
+    userId: userStore.userId,
+    users: selectedMembers.value.map((member) => member.userId),
+  });
+
+  // reload user data
+  loadUserData();
+
+  navigateTo(`/group-${createdGroup.value?.createGroup.id}/team`);
+};
+// ----------------- SUBMIT INPUT---------------------------//
 </script>

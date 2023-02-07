@@ -1,7 +1,7 @@
 <template>
   <div
     class="h-full border-r border-slate-700 bg-gray-800 p-2 subpixel-antialiased transition-all duration-200"
-    :class="props.display ? 'visible w-full md:w-56' : 'collapse w-0'"
+    :class="props.display ? 'visible w-full md:w-60' : 'collapse w-0'"
   >
     <div v-if="display" class="flex h-full w-full flex-col">
       <div class="h-14 border-b border-b-slate-600">
@@ -36,9 +36,9 @@
             <NuxtLink to="/Overview">Overview</NuxtLink>
           </span>
         </div>
-        <div class="flex flex-grow flex-col gap-3">
+        <div class="flex flex-grow flex-col gap-3 overflow-y-auto">
           <div
-            class="flex flex-row items-center justify-start text-base font-bold"
+            class="flex flex-row items-center justify-start pr-2 text-base font-bold"
           >
             <svg
               class="h-4 w-4 text-inherit"
@@ -76,7 +76,7 @@
             </div>
           </div>
 
-          <div class="flex flex-grow flex-col gap-2">
+          <div class="flex flex-grow flex-col gap-2 pr-4">
             <div
               v-for="group in groups"
               :key="group.id"
@@ -157,7 +157,7 @@
       <div class="min-h-[25%] flex-1 overflow-y-auto">
         <div class="flex flex-grow flex-col gap-2">
           <div
-            class="flex flex-row items-center justify-start pt-2 text-base font-bold"
+            class="flex flex-row items-center justify-start pt-2 pr-2 text-base font-bold"
           >
             <svg
               class="h-4 w-4 text-inherit"
@@ -273,7 +273,6 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { graphql } from "~~/gql/gql";
 import { useUserStore } from "~~/stores/UserStore";
 
 const props = defineProps({
@@ -335,26 +334,7 @@ const groups = computed(() => {
 // ---------------- Life cycle methods -------------------------------------------
 // -------------------------------------------------------------------------------
 onBeforeMount(async () => {
-  // load relevant information
-  const query = graphql(`
-    query whoaAmI {
-      whoAmI {
-        email
-        username
-        userId
-        groups {
-          id
-          name
-        }
-      }
-    }
-  `);
-
-  const result = await sendQuery(query, {});
-  if (result.value) {
-    const userStore = useUserStore();
-    userStore.setUserStore(result.value);
-  }
+  await loadUserData();
 });
 </script>
 

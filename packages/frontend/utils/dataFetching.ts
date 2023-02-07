@@ -3,16 +3,11 @@ import { Ref } from "vue";
 import jwtDecode from "jwt-decode";
 import { logOut } from "./LoginFunctions";
 import { graphql } from "~~/gql/gql";
-import { Exact } from "~~/gql/graphql";
+
 import { useAuth } from "@/stores/AuthStore";
 
 export async function sendQuery<T>(
-  query: TypedDocumentNode<
-    T,
-    Exact<{
-      [key: string]: never;
-    }>
-  >,
+  query: TypedDocumentNode<T, any>,
   variables: OperationVariables
 ): Promise<Ref<T | null>> {
   // First, try to fetch data from query

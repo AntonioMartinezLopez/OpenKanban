@@ -19,4 +19,9 @@ export class CreateGroupInput {
     nullable: true,
   })
   boardDescription: string;
+
+  @Field(() => [String], {
+    description: 'users of the group',
+  })
+  users: string[];
 }
