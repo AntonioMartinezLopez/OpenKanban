@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex h-screen min-h-[350px] flex-col bg-gray-900 bg-gradient-to-b from-gray-900 to-slate-800 text-sm text-zinc-300"
+    class="flex h-screen min-h-[350px] flex-col bg-gray-900 text-sm text-zinc-300"
   >
     <header
       class="grid h-12 grid-cols-6 border-b border-slate-700 bg-gray-800 subpixel-antialiased"

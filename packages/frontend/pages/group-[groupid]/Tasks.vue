@@ -1,10 +1,8 @@
 <template>
   <div
-    class="m-auto flex h-[95%] w-[95%] flex-col overflow-y-auto rounded-md border border-gray-600 bg-gray-900 p-4 shadow-lg shadow-gray-700/50 md:w-[90%] md:p-10"
+    class="m-auto flex h-[95%] w-[95%] flex-col overflow-y-auto p-1 md:w-[90%] md:p-2"
   >
-    <div
-      class="flex h-14 flex-row items-center border-b-2 border-b-gray-500 text-inherit"
-    >
+    <div class="flex h-14 flex-row items-center text-inherit">
       <svg
         class="h-8 w-8 text-inherit"
         width="24"
@@ -28,12 +26,14 @@
       <button
         class="ml-auto h-8 w-24 rounded-md bg-green-600 text-base text-slate-100 transition-all duration-300 ease-in hover:bg-green-700"
       >
-        New Task
+        <NuxtLink :to="`/group-${groupRoute}/createtask`">New Task</NuxtLink>
       </button>
     </div>
     <div class="grid h-full w-full grid-cols-3 gap-4 pt-4">
       <!-- OPEN TASKS -->
-      <div class="col-span-3 rounded-md border border-gray-500 md:col-span-1">
+      <div
+        class="col-span-3 rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
+      >
         <div
           class="flex h-12 w-full flex-row items-center justify-end gap-2 rounded-t-md border-b border-gray-500 bg-slate-800 p-2"
         >
@@ -79,7 +79,9 @@
         </div>
       </div>
       <!-- SELECTED TASKS -->
-      <div class="col-span-3 rounded-md border border-gray-500 md:col-span-1">
+      <div
+        class="col-span-3 rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
+      >
         <div
           class="flex h-12 w-full flex-row items-center justify-end gap-2 rounded-t-md border-b border-gray-500 bg-slate-800 p-2"
         >
@@ -125,7 +127,9 @@
         </div>
       </div>
       <!-- CLOSED TASKS -->
-      <div class="col-span-3 rounded-md border border-gray-500 md:col-span-1">
+      <div
+        class="col-span-3 rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
+      >
         <div
           class="flex h-12 w-full flex-row items-center justify-end gap-2 rounded-t-md border-b border-gray-500 bg-slate-800 p-2"
         >
@@ -177,4 +181,8 @@
 <script setup lang="ts">
 // definePageMeta({ middleware: "auth" });
 // const routeParams = useRoute().params;
+const route = useRoute();
+const groupRoute = computed(() => {
+  return route.params.groupid ? (route.params.groupid as string) : "";
+});
 </script>
