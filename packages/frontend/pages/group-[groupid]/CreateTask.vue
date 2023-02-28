@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-auto flex h-[90%] w-[95%] flex-col overflow-y-auto rounded-md border border-gray-600 bg-gray-900 p-4 shadow-lg shadow-gray-700/50 md:w-[50%] md:p-6"
+    class="m-auto flex h-[90%] w-[95%] flex-col overflow-y-auto rounded-md border border-gray-600 bg-gray-900 p-4 shadow-lg shadow-gray-700/50 md:w-[50%] md:p-8"
   >
     <div
       class="flex h-14 flex-row items-center border-b-2 border-b-gray-500 text-inherit"
@@ -26,7 +26,7 @@
       </svg>
       <span class="ml-4 text-3xl">Create New Task</span>
     </div>
-    <div class="grid-rows-7 grid flex-1">
+    <div class="grid-rows-7 grid flex-1 p-2">
       <div class="row-span-1 flex flex-col items-start justify-center p-2">
         <h3 class="w-full text-lg">Task Title</h3>
         <input
@@ -36,47 +36,109 @@
           type="text"
         />
       </div>
+      <!-- DESCRIPTION -->
       <div
-        class="duration-600 row-span-2 flex flex-col content-center items-start p-2 transition-all"
+        class="duration-600 row-span-2 flex flex-col content-center items-start overflow-auto p-2 transition-all"
       >
         <h3 class="w-full text-lg">Description</h3>
         <textarea
           v-model="descriptionInput"
-          class="duration-400 w-full flex-1 resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+          class="duration-400 w-full flex-1 resize-none rounded-md border border-gray-600 bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
           tabindex="1"
           type="text"
         />
       </div>
-      <div class="row-span-1">
-        <div class="flex flex-col content-center justify-center p-2">
+      <!-- WEIGHT AND LABELS -->
+      <div class="row-span-1 flex flex-row flex-wrap md:justify-between">
+        <!-- WEIGHT -->
+        <div
+          class="flex w-full flex-col content-center justify-center p-2 md:w-[50%]"
+        >
           <h3 class="w-full text-lg">Weight</h3>
-          <div class="mt-1 flex w-20 flex-row gap-1">
+          <div class="mt-1 flex w-[50%] flex-row">
+            <span
+              class="flex h-full w-[20%] select-none flex-row content-center items-center justify-center rounded-tl-md rounded-bl-md border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
+              @click="removeWeight"
+              >-</span
+            >
             <input
-              v-model="groupNameInput"
-              class="duration-400 h-7 w-10 rounded-md border border-gray-600 bg-slate-800 pl-2 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+              v-model="weightInput"
+              class="duration-400 h-7 w-[60%] border border-gray-600 bg-slate-800 text-center text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
               tabindex="1"
             />
-            <div class="flex h-7 w-5 flex-col justify-center gap-1">
-              <span
-                class="flex h-[40%] flex-row content-center items-start justify-center rounded-xl bg-slate-800 text-sm font-bold leading-[0.5rem] text-gray-500 hover:opacity-80"
-                >+</span
-              >
-              <span
-                class="flex h-[40%] flex-row content-center justify-center rounded-xl bg-slate-800 text-lg font-bold leading-[0.5rem] text-gray-500 hover:opacity-80"
-                >-</span
-              >
+
+            <span
+              class="flex h-full w-[20%] select-none flex-row content-center items-center justify-center rounded-tr-md rounded-br-md border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
+              @click="addWeight"
+              >+</span
+            >
+          </div>
+        </div>
+        <!-- LABELS - TO BE EXTRACTED -->
+        <div
+          class="flex w-full flex-col content-center justify-center p-2 md:w-[50%]"
+        >
+          <h3 class="w-full text-lg">Labels</h3>
+          <div class="relative mt-1 flex w-[100%] flex-row gap-1">
+            <input
+              v-model="groupNameInput"
+              class="duration-400 h-7 w-full rounded-md border border-gray-600 bg-slate-800 pl-2 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+              tabindex="1"
+              @focus="labelOptionsOpened = true"
+              @blur="
+                () => {
+                  labelOptionsOpened = false;
+                }
+              "
+            />
+            <div
+              class="duration-400 absolute z-20 flex h-40 w-full flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
+              :class="
+                labelOptionsOpened
+                  ? 'visible top-0 opacity-100'
+                  : 'invisible -top-4 opacity-0'
+              "
+            >
+              <div v-for="label in labels" :key="label.id">
+                <div
+                  class="flex h-11 w-full border-b border-gray-500 bg-gray-800 pl-4 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:bg-gray-700"
+                  @click="addOrRemoveLabel(label)"
+                >
+                  <div class="flex flex-1 flex-col items-start pl-4">
+                    {{ label.name }}
+                  </div>
+                  <div
+                    v-if="labelSelected(label)"
+                    class="mr-2 flex w-4 flex-col items-center justify-center"
+                  >
+                    <svg
+                      class="h-4 w-4 text-green-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <!-- USER OPTION - TO BE EXTRACTED -->
       <div
-        class="duration-600 relative row-span-2 flex flex-col content-center items-start border-b-2 border-b-gray-500 p-2 pt-0 transition-all"
+        class="duration-600 relative row-span-2 flex flex-col content-center items-start p-2 transition-all"
       >
         <h3 class="w-full text-lg">Assignees</h3>
         <input
           v-model="searchedMember"
-          class="duration-400 h-7 w-72 resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+          class="duration-400 h-7 w-full max-w-[15rem] resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
           tabindex="1"
           type="text"
           @focus="opened = true"
@@ -89,7 +151,7 @@
         />
         <div class="relative w-full flex-1">
           <div
-            class="duration-400 absolute z-20 flex h-full w-72 flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
+            class="duration-400 absolute z-20 flex h-full w-full max-w-[15rem] flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
             :class="
               opened
                 ? 'visible top-0 opacity-100'
@@ -134,7 +196,7 @@
             </div>
           </div>
           <div
-            class="flex h-full max-h-36 w-full flex-row flex-wrap items-start justify-start gap-2 overflow-y-scroll pt-6"
+            class="flex h-full max-h-32 w-full flex-row flex-wrap items-start justify-start gap-2 overflow-y-scroll pt-6"
           >
             <!-- USER CARD - TO BE EXTRCATED -->
             <div
@@ -177,7 +239,7 @@
         </div>
       </div>
       <div
-        class="row-span-1 mr-2 flex h-full w-full flex-row items-center justify-end gap-7"
+        class="row-span-1 mr-2 flex h-full w-full flex-row items-center justify-end gap-7 border-t-2 border-t-gray-500 pt-2"
       >
         <button
           class="h-8 w-16 rounded-md bg-red-500 text-slate-100 hover:bg-red-600"
@@ -202,7 +264,7 @@
 
 <script setup lang="ts">
 import { graphql } from "~~/gql/gql";
-import { User } from "~~/gql/graphql";
+import { Label, User } from "~~/gql/graphql";
 import { useUserStore } from "~~/stores/UserStore";
 import { sendQuery } from "~~/utils/dataFetching";
 
@@ -273,6 +335,59 @@ const filteredMemberList = computed(() => {
   }
   return users.filter((user) => user.userId !== userStore.userId);
 });
+
+// 4: Task weight
+const weightInput = ref(0);
+
+const addWeight = () => {
+  weightInput.value = weightInput.value + 1;
+};
+const removeWeight = () => {
+  if (weightInput.value > 0) {
+    weightInput.value = weightInput.value - 1;
+  }
+};
+
+watch(weightInput, (newValue, oldValue) => {
+  const number = Number(newValue);
+  if (Number.isInteger(number) && newValue !== null && number <= 10) {
+    weightInput.value = Number(newValue);
+  } else {
+    weightInput.value = oldValue;
+  }
+});
+
+// 5: selected Labels
+const labelOptionsOpened = ref(false);
+const labels = ref<Partial<Label>[]>([
+  { id: "1", color: "red", name: "TestLabel1" },
+  { id: "2", color: "yellow", name: "TestLabel1" },
+  { id: "3", color: "green", name: "TestLabel1" },
+]);
+
+const selectedLabels = ref<Partial<Label>[]>([]);
+
+const labelSelected = (label: Partial<Label>): boolean => {
+  return selectedLabels.value.some((selectedLabel) => {
+    return label.id === selectedLabel.id;
+  });
+};
+const addOrRemoveLabel = (label: Partial<Label>) => {
+  // check whether user already exists, then delete the user from the group of selected users
+  const labelIndex = selectedLabels.value.findIndex((selectedLabel) => {
+    return label.id === selectedLabel.id;
+  });
+
+  // not found -> add to selected list
+  if (labelIndex === -1) {
+    selectedLabels.value.push(label);
+  }
+  // found ->remove from list
+  else {
+    selectedLabels.value.splice(labelIndex, 1);
+  }
+};
+
 // ----------------- HANDLE INPUT---------------------------//
 //
 // ----------------- USER DATA---------------------------//
