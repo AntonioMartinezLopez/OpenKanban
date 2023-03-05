@@ -1,6 +1,6 @@
 <template>
   <div
-    class="m-auto flex h-[90%] w-[95%] flex-col overflow-y-auto rounded-md border border-gray-600 bg-gray-900 p-4 shadow-lg shadow-gray-700/50 md:w-[50%] md:p-8"
+    class="m-auto flex h-[90%] w-[95%] flex-col overflow-y-auto rounded-md border border-gray-600 bg-gray-900 p-4 shadow-lg shadow-gray-700/50 lg:w-[50%] lg:p-8"
   >
     <div
       class="flex h-14 flex-row items-center border-b-2 border-b-gray-500 text-inherit"
@@ -52,7 +52,7 @@
       <div class="row-span-1 flex flex-row flex-wrap md:justify-between">
         <!-- WEIGHT -->
         <div
-          class="flex w-full flex-col content-center justify-center p-2 md:w-[50%]"
+          class="flex w-full flex-col content-center justify-center p-2 md:w-[40%]"
         >
           <h3 class="w-full text-lg">Weight</h3>
           <div class="mt-1 flex w-[50%] flex-row">
@@ -76,36 +76,66 @@
         </div>
         <!-- LABELS - TO BE EXTRACTED -->
         <div
-          class="flex w-full flex-col content-center justify-center p-2 md:w-[50%]"
+          class="flex w-full flex-col content-center justify-center p-2 md:w-[60%]"
         >
           <h3 class="w-full text-lg">Labels</h3>
-          <div class="relative mt-1 flex w-[100%] flex-row gap-1">
-            <input
-              v-model="groupNameInput"
-              class="duration-400 h-7 w-full rounded-md border border-gray-600 bg-slate-800 pl-2 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
-              tabindex="1"
-              @focus="labelOptionsOpened = true"
-              @blur="
-                () => {
-                  labelOptionsOpened = false;
-                }
-              "
-            />
+          <div
+            class="relative mt-1 flex h-7 w-full flex-row items-center gap-1"
+          >
+            <div
+              class="flex h-full w-fit flex-row items-center justify-center gap-2"
+            >
+              <div
+                v-for="label in selectedLabels"
+                :key="`label-${label.id}`"
+                class="flex items-center justify-center"
+              >
+                <span
+                  class="flex h-fit min-w-fit flex-col flex-nowrap content-center justify-center whitespace-nowrap rounded-lg border-[1px] p-[0.1rem] pl-[0.3rem] pr-[0.3rem] text-xs shadow-md shadow-inherit brightness-150"
+                  :style="`border-color: rgb(${label.color}); ; color: rgb(${label.color}); background-color: rgb(${label.color} / 0.2); --tw-shadow-color: rgb(${label.color} / 0.3);`"
+                  >{{ label.name }}</span
+                >
+              </div>
+            </div>
+            <div
+              class="flex h-4 w-4 select-none flex-col items-center justify-center rounded-full border border-transparent bg-gray-700 text-xs font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
+              @click="labelOptionsOpened = true"
+            >
+              +
+            </div>
+
             <div
               class="duration-400 absolute z-20 flex h-40 w-full flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
               :class="
                 labelOptionsOpened
-                  ? 'visible top-0 opacity-100'
+                  ? 'visible top-7 opacity-100'
                   : 'invisible -top-4 opacity-0'
               "
             >
+              <input
+                v-model="groupNameInput"
+                class="duration-400 h-7 min-w-[1rem] flex-1 bg-gray-700 text-base text-gray-400 caret-green-500 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+                tabindex="1"
+                @focus="labelOptionsOpened = true"
+                @blur="
+                  () => {
+                    labelOptionsOpened = false;
+                  }
+                "
+              />
               <div v-for="label in labels" :key="label.id">
                 <div
                   class="flex h-11 w-full border-b border-gray-500 bg-gray-800 pl-4 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:bg-gray-700"
                   @click="addOrRemoveLabel(label)"
                 >
-                  <div class="flex flex-1 flex-col items-start pl-4">
-                    {{ label.name }}
+                  <div
+                    class="flex flex-1 flex-col items-start justify-center pl-4"
+                  >
+                    <span
+                      class="flex w-fit content-center items-center rounded-lg border-[1px] p-[0.1rem] text-sm shadow-md shadow-inherit brightness-150"
+                      :style="`border-color: rgb(${label.color}); color: rgb(${label.color}); background-color: rgb(${label.color} / 0.2); --tw-shadow-color: rgb(${label.color} / 0.4);`"
+                      >{{ label.name }}</span
+                    >
                   </div>
                   <div
                     v-if="labelSelected(label)"
@@ -196,7 +226,7 @@
             </div>
           </div>
           <div
-            class="flex h-full max-h-32 w-full flex-row flex-wrap items-start justify-start gap-2 overflow-y-scroll pt-6"
+            class="flex h-full max-h-32 w-full flex-row flex-wrap items-start justify-start gap-2 overflow-y-auto pt-6"
           >
             <!-- USER CARD - TO BE EXTRCATED -->
             <div
@@ -360,9 +390,9 @@ watch(weightInput, (newValue, oldValue) => {
 // 5: selected Labels
 const labelOptionsOpened = ref(false);
 const labels = ref<Partial<Label>[]>([
-  { id: "1", color: "red", name: "TestLabel1" },
-  { id: "2", color: "yellow", name: "TestLabel1" },
-  { id: "3", color: "green", name: "TestLabel1" },
+  { id: "1", color: "204 51 82", name: "Bug fix" },
+  { id: "2", color: "189 184 45", name: "Change Request" },
+  { id: "3", color: "37 186 47", name: "New Feature" },
 ]);
 
 const selectedLabels = ref<Partial<Label>[]>([]);
