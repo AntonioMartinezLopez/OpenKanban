@@ -14,9 +14,12 @@ export class CreateTaskInput {
   })
   maxWeight: number;
 
-  @Field({ description: 'Board Id' })
-  boardId: string;
+  @Field({ description: 'Group Id' })
+  groupId: string;
 
-  @Field(() => [String], { description: 'Board Id' })
+  @Field(() => [String], { description: 'assignees' })
   assignees: string[];
+
+  @Field(() => [String], { description: 'labels' })
+  labels: string[];
 }

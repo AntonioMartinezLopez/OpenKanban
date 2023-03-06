@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Label {
+  """Label Id"""
+  id: String!
+
+  """The name of the label"""
+  name: String!
+
+  """Color of the label"""
+  color: String!
+}
+
 type Task {
   """Task Id"""
   id: String!
@@ -29,17 +40,6 @@ type Boardcolumn {
   tasks: [Task!]!
 }
 
-type Label {
-  """Label Id"""
-  id: String!
-
-  """The name of the label"""
-  name: String!
-
-  """Color of the label"""
-  color: String!
-}
-
 type Board {
   """Board id"""
   id: String!
@@ -50,7 +50,6 @@ type Board {
   """The desciription of the user"""
   description: String!
   columns: [Boardcolumn!]!
-  tasks: [Task!]!
   labels: [Label!]!
 }
 
@@ -79,6 +78,7 @@ type Group {
   creator: User
   users: [User!]
   board: Board
+  tasks: [Task!]!
   messages: [Message!]!
 }
 
@@ -248,11 +248,14 @@ input CreateTaskInput {
   """Calculated weight of a task"""
   maxWeight: Int
 
-  """Board Id"""
-  boardId: String!
+  """Group Id"""
+  groupId: String!
 
-  """Board Id"""
+  """assignees"""
   assignees: [String!]!
+
+  """labels"""
+  labels: [String!]!
 }
 
 input UpdateTaskInput {
@@ -265,11 +268,14 @@ input UpdateTaskInput {
   """Calculated weight of a task"""
   maxWeight: Int
 
-  """Board Id"""
-  boardId: String
+  """Group Id"""
+  groupId: String
 
   """Board Id"""
   assignees: [String!]!
+
+  """Labels"""
+  labels: [String!]!
 
   """Task Id"""
   id: String!

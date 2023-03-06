@@ -39,6 +39,7 @@ export default defineNuxtConfig({
           },
           transitionProperty: {
             height: "height",
+            width: "width",
           },
         },
       },

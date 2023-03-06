@@ -20,4 +20,7 @@ export class UpdateTaskInput extends PartialType(CreateTaskInput) {
 
   @Field(() => [String], { description: 'Board Id' })
   assignees: string[];
+
+  @Field(() => [String], { description: 'Labels' })
+  labels: string[];
 }
