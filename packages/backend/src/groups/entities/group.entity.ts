@@ -1,6 +1,7 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Board } from 'src/board/entities/board.entity';
 import { Message } from 'src/message/entities/message.entity';
+import { Task } from 'src/task/entities/task.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -48,4 +49,9 @@ export class Group {
 
   @OneToMany(() => Message, (msg) => msg.group)
   messages: Message[];
+
+  @OneToMany(() => Task, (task) => task.group, {
+    cascade: ['insert', 'update', 'remove'],
+  })
+  tasks: Task[];
 }

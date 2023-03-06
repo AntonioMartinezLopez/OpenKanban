@@ -8,5 +8,6 @@ import { BoardModule } from 'src/board/board.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Label]), BoardModule],
   providers: [LabelResolver, LabelService],
+  exports: [LabelService],
 })
 export class LabelModule {}

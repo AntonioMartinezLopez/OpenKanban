@@ -30,7 +30,7 @@
       <div class="row-span-1 flex flex-col items-start justify-center p-2">
         <h3 class="w-full text-lg">Task Title</h3>
         <input
-          v-model="groupNameInput"
+          v-model="taskNameInput"
           class="duration-400 h-7 w-full rounded-md border border-gray-600 bg-slate-800 pl-2 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
           tabindex="1"
           type="text"
@@ -83,7 +83,7 @@
             class="relative mt-1 flex h-7 w-full flex-row items-center gap-1"
           >
             <div
-              class="flex h-full w-fit flex-row items-center justify-center gap-2"
+              class="transition-width flex h-full w-fit flex-row items-center justify-center gap-2 duration-500 ease-in"
             >
               <div
                 v-for="label in selectedLabels"
@@ -98,8 +98,8 @@
               </div>
             </div>
             <div
-              class="flex h-4 w-4 select-none flex-col items-center justify-center rounded-full border border-transparent bg-gray-700 text-xs font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
-              @click="labelOptionsOpened = true"
+              class="ml-1 flex h-7 w-7 select-none flex-col items-center justify-center rounded-full border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
+              @click="labelOptionsOpened = !labelOptionsOpened"
             >
               +
             </div>
@@ -108,13 +108,13 @@
               class="duration-400 absolute z-20 flex h-40 w-full flex-col overflow-y-auto rounded-md bg-slate-800 text-base text-gray-400 transition-all ease-in"
               :class="
                 labelOptionsOpened
-                  ? 'visible top-7 opacity-100'
+                  ? 'visible top-8 opacity-100'
                   : 'invisible -top-4 opacity-0'
               "
             >
               <input
-                v-model="groupNameInput"
-                class="duration-400 h-7 min-w-[1rem] flex-1 bg-gray-700 text-base text-gray-400 caret-green-500 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
+                v-model="searchLabelTerm"
+                class="duration-400 h-7 min-w-[1rem] rounded-md border border-gray-600 bg-slate-800 text-center text-base text-gray-400 caret-green-500 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
                 tabindex="1"
                 @focus="labelOptionsOpened = true"
                 @blur="
@@ -123,16 +123,16 @@
                   }
                 "
               />
-              <div v-for="label in labels" :key="label.id">
+              <div v-for="label in filteredLabelList" :key="label.id">
                 <div
-                  class="flex h-11 w-full border-b border-gray-500 bg-gray-800 pl-4 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:bg-gray-700"
+                  class="flex h-9 w-full border-b border-gray-500 bg-gray-800 pl-4 shadow-md shadow-gray-700/40 hover:cursor-pointer hover:bg-gray-700"
                   @click="addOrRemoveLabel(label)"
                 >
                   <div
                     class="flex flex-1 flex-col items-start justify-center pl-4"
                   >
                     <span
-                      class="flex w-fit content-center items-center rounded-lg border-[1px] p-[0.1rem] text-sm shadow-md shadow-inherit brightness-150"
+                      class="flex h-fit min-w-fit flex-col flex-nowrap content-center justify-center whitespace-nowrap rounded-lg border-[1px] p-[0.1rem] pl-[0.3rem] pr-[0.3rem] text-xs shadow-md shadow-inherit brightness-150"
                       :style="`border-color: rgb(${label.color}); color: rgb(${label.color}); background-color: rgb(${label.color} / 0.2); --tw-shadow-color: rgb(${label.color} / 0.4);`"
                       >{{ label.name }}</span
                     >
@@ -281,7 +281,7 @@
           class="h-8 w-24 rounded-md bg-green-600 text-slate-100 transition-all duration-300 ease-in hover:bg-green-700"
           :class="{
             'pointer-events-none cursor-not-allowed opacity-25':
-              !descriptionInput,
+              !descriptionInput || !taskNameInput,
           }"
           @click="submitInput"
         >
@@ -320,8 +320,8 @@ const users = userData.value ? userData.value.users : [];
 //
 // ----------------- HANDLE INPUT---------------------------//
 
-// 1: Group name
-const groupNameInput = ref("");
+// 1: Task name
+const taskNameInput = ref("");
 
 // 2: description input
 const descriptionInput = ref("");
@@ -388,6 +388,7 @@ watch(weightInput, (newValue, oldValue) => {
 });
 
 // 5: selected Labels
+const searchLabelTerm = ref("");
 const labelOptionsOpened = ref(false);
 const labels = ref<Partial<Label>[]>([
   { id: "1", color: "204 51 82", name: "Bug fix" },
@@ -418,6 +419,17 @@ const addOrRemoveLabel = (label: Partial<Label>) => {
   }
 };
 
+const filteredLabelList = computed(() => {
+  if (searchLabelTerm.value !== "") {
+    return labels.value.filter((label) => {
+      return label.name
+        ?.toLowerCase()
+        .includes(searchLabelTerm.value.toLowerCase());
+    });
+  }
+  return labels.value;
+});
+
 // ----------------- HANDLE INPUT---------------------------//
 //
 // ----------------- USER DATA---------------------------//
@@ -426,36 +438,44 @@ const userStore = useUserStore();
 //
 // ----------------- SUBMIT INPUT---------------------------//
 const submitInput = async () => {
-  const createGroupQuery = graphql(`
-    mutation createGroup(
+  const createTaskQuery = graphql(`
+    mutation createTask(
       $name: String!
       $description: String!
-      $userId: String!
-      $users: [String!]!
+      $groupId: String!
+      $maxWeight: Int!
+      $assignees: [String!]!
+      $labels: [String!]!
     ) {
-      createGroup(
-        createGroupInput: {
+      createTask(
+        createTaskInput: {
           name: $name
           description: $description
-          userId: $userId
-          users: $users
+          groupId: $groupId
+          maxWeight: $maxWeight
+          assignees: $assignees
+          labels: $labels
         }
       ) {
         id
       }
     }
   `);
-  const createdGroup = await sendQuery(createGroupQuery, {
-    name: groupNameInput.value,
+
+  const createdTask = await sendQuery(createTaskQuery, {
+    name: taskNameInput.value,
     description: descriptionInput.value,
-    userId: userStore.userId,
-    users: selectedMembers.value.map((member) => member.userId),
+    groupId: useRoute().params.groupId,
+    maxWeight: weightInput,
+    assignees: selectedMembers.value.map((member) => member.userId),
+    labels: selectedLabels.value.map((label) => label.id),
   });
 
-  // reload user data
-  loadUserData();
+  // // reload user data
+  // loadUserData();
 
-  navigateTo(`/group-${createdGroup.value?.createGroup.id}/team`);
+  console.log(createdTask);
+  // navigateTo(`/group-${createdGroup.value?.createGroup.id}/team`);
 };
 // ----------------- SUBMIT INPUT---------------------------//
 </script>

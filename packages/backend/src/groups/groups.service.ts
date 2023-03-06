@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BoardService } from 'src/board/board.service';
 import { Board } from 'src/board/entities/board.entity';
 import { Message } from 'src/message/entities/message.entity';
+import { Task } from 'src/task/entities/task.entity';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
@@ -185,6 +186,14 @@ export class GroupsService {
       where: { id: groupId },
     });
     return group.creator;
+  }
+
+  async resolveTasks(boardId: string): Promise<Task[]> {
+    const result = await this.groupRepository.findOne({
+      relations: ['tasks'],
+      where: { id: boardId },
+    });
+    return result.tasks;
   }
 
   async messages(groupId: string): Promise<Message[]> {

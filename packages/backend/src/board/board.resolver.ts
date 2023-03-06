@@ -11,7 +11,6 @@ import { Board } from './entities/board.entity';
 import { CreateBoardInput } from './dto/create-board.input';
 import { UpdateBoardInput } from './dto/update-board.input';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
-import { Task } from 'src/task/entities/task.entity';
 import { Label } from 'src/label/entities/label.entity';
 
 @Resolver(() => Board)
@@ -46,11 +45,6 @@ export class BoardResolver {
   @ResolveField(() => [Boardcolumn])
   async columns(@Parent() board: Board): Promise<Boardcolumn[]> {
     return this.boardService.resolveBoardColumns(board.id);
-  }
-
-  @ResolveField(() => [Task])
-  async tasks(@Parent() board: Board): Promise<Task[]> {
-    return this.boardService.resolveTasks(board.id);
   }
 
   @ResolveField(() => [Label])

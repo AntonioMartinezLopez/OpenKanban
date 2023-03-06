@@ -1,6 +1,7 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Board } from 'src/board/entities/board.entity';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
+import { Group } from 'src/groups/entities/group.entity';
+import { Label } from 'src/label/entities/label.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -38,8 +39,8 @@ export class Task {
   @UpdateDateColumn()
   updated: Date;
 
-  @ManyToOne(() => Board, (board) => board.tasks, { onDelete: 'CASCADE' })
-  board: Board;
+  @ManyToOne(() => Group, (group) => group.tasks, { onDelete: 'CASCADE' })
+  group: Group;
 
   @ManyToOne(() => Boardcolumn, (board) => board.tasks, {
     onDelete: 'SET NULL',
@@ -47,6 +48,13 @@ export class Task {
     cascade: ['insert'],
   })
   boardColumn: Boardcolumn;
+
+  @ManyToMany(() => Label, (label) => label.tasks, {
+    onDelete: 'CASCADE',
+    cascade: ['insert', 'remove'],
+  })
+  @JoinTable()
+  labels: Label[];
 
   @ManyToMany(() => User, (user) => user.tasks, {
     cascade: ['insert', 'update'],

@@ -1,8 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
 import { Label } from 'src/label/entities/label.entity';
-import { Task } from 'src/task/entities/task.entity';
-// import { Group } from 'src/groups/entities/group.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -24,11 +22,6 @@ export class Board {
     cascade: true,
   })
   columns: Boardcolumn[];
-
-  @OneToMany(() => Task, (task) => task.board, {
-    cascade: ['insert', 'update', 'remove'],
-  })
-  tasks: Task[];
 
   @OneToMany(() => Label, (label) => label.board, {
     cascade: ['remove', 'update'],
