@@ -51,29 +51,10 @@
       <!-- WEIGHT AND LABELS -->
       <div class="row-span-1 flex flex-row flex-wrap md:justify-between">
         <!-- WEIGHT -->
-        <div
-          class="flex w-full flex-col content-center justify-center p-2 md:w-[40%]"
-        >
-          <h3 class="w-full text-lg">Weight</h3>
-          <div class="mt-1 flex w-[50%] flex-row">
-            <span
-              class="flex h-full w-[20%] select-none flex-row content-center items-center justify-center rounded-tl-md rounded-bl-md border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
-              @click="removeWeight"
-              >-</span
-            >
-            <input
-              v-model="weightInput"
-              class="duration-400 h-7 w-[60%] border border-gray-600 bg-slate-800 text-center text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
-              tabindex="1"
-            />
-
-            <span
-              class="flex h-full w-[20%] select-none flex-row content-center items-center justify-center rounded-tr-md rounded-br-md border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
-              @click="addWeight"
-              >+</span
-            >
-          </div>
-        </div>
+        <InputWeightInput
+          v-model="weightInput"
+          :max-weight="10"
+        ></InputWeightInput>
         <!-- LABELS - TO BE EXTRACTED -->
         <div
           class="flex w-full flex-col content-center justify-center p-2 md:w-[60%]"
@@ -381,24 +362,6 @@ const filteredMemberList = computed(() => {
 
 // 4: Task weight
 const weightInput = ref(0);
-
-const addWeight = () => {
-  weightInput.value = weightInput.value + 1;
-};
-const removeWeight = () => {
-  if (weightInput.value > 0) {
-    weightInput.value = weightInput.value - 1;
-  }
-};
-
-watch(weightInput, (newValue, oldValue) => {
-  const number = Number(newValue);
-  if (Number.isInteger(number) && newValue !== null && number <= 10) {
-    weightInput.value = Number(newValue);
-  } else {
-    weightInput.value = oldValue;
-  }
-});
 
 // 5: selected Labels
 const searchLabelTerm = ref("");
