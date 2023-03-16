@@ -13,10 +13,10 @@ export class LabelResolver {
     return this.labelService.create(createLabelInput);
   }
 
-  // @Query(() => [Label], { name: 'label' })
-  // findAll() {
-  //   return this.labelService.findAll();
-  // }
+  @Query(() => [Label], { name: 'labels' })
+  findAll() {
+    return this.labelService.findAll();
+  }
 
   @Query(() => Label, { name: 'label' })
   findOne(@Args('id', { type: () => String }) id: string) {

@@ -23,6 +23,7 @@ import { Roles } from 'src/auth/roles/roles.decorator';
 import { Role } from 'src/auth/roles/role.enum';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Task } from 'src/task/entities/task.entity';
+import { Label } from 'src/label/entities/label.entity';
 
 @Resolver(() => Group)
 export class GroupsResolver {
@@ -124,6 +125,11 @@ export class GroupsResolver {
   @ResolveField(() => [Task])
   async tasks(@Parent() group: Group): Promise<Task[]> {
     return this.groupsService.resolveTasks(group.id);
+  }
+
+  @ResolveField(() => [Label])
+  async labels(@Parent() board: Board): Promise<Label[]> {
+    return this.groupsService.resolveLabels(board.id);
   }
 
   @ResolveField(() => [Message])
