@@ -21,7 +21,7 @@ export class Task {
   @Field({ description: 'Task Id' })
   id: string;
 
-  @Column('text', { unique: true })
+  @Column('text')
   @Field({ description: 'The name of the task' })
   name: string;
 

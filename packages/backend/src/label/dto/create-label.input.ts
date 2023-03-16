@@ -8,6 +8,6 @@ export class CreateLabelInput {
   @Field({ description: 'color of the label' })
   color: string;
 
-  @Field({ description: 'id of the corresponding board' })
-  boardId: string;
+  @Field({ description: 'id of the corresponding group' })
+  groupId: string;
 }

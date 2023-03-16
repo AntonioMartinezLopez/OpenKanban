@@ -1,6 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
-import { Label } from 'src/label/entities/label.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -22,9 +21,4 @@ export class Board {
     cascade: true,
   })
   columns: Boardcolumn[];
-
-  @OneToMany(() => Label, (label) => label.board, {
-    cascade: ['remove', 'update'],
-  })
-  labels: Label[];
 }

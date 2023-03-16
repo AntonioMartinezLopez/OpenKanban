@@ -101,7 +101,7 @@
               class="ml-1 flex h-7 w-7 select-none flex-col items-center justify-center rounded-full border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
               @click="labelOptionsOpened = !labelOptionsOpened"
             >
-              +
+              <span class="m-auto h-[50%] leading-3">+</span>
             </div>
 
             <div
@@ -316,6 +316,19 @@ const queryUsers = graphql(`
 `);
 const userData = await sendQuery(queryUsers, {});
 const users = userData.value ? userData.value.users : [];
+
+// fetch label data
+const queryLabels = graphql(`
+  query labels {
+    labels {
+      id
+      name
+      color
+    }
+  }
+`);
+const labelData = await sendQuery(queryLabels, {});
+const labels = labelData.value ? labelData.value.labels : [];
 // -----------------FETCH DATA----------------------------//
 //
 // ----------------- HANDLE INPUT---------------------------//
@@ -390,11 +403,11 @@ watch(weightInput, (newValue, oldValue) => {
 // 5: selected Labels
 const searchLabelTerm = ref("");
 const labelOptionsOpened = ref(false);
-const labels = ref<Partial<Label>[]>([
-  { id: "1", color: "204 51 82", name: "Bug fix" },
-  { id: "2", color: "189 184 45", name: "Change Request" },
-  { id: "3", color: "37 186 47", name: "New Feature" },
-]);
+// const labels = ref<Partial<Label>[]>([
+//   { id: "1", color: "204 51 82", name: "Bug fix" },
+//   { id: "2", color: "189 184 45", name: "Change Request" },
+//   { id: "3", color: "37 186 47", name: "New Feature" },
+// ]);
 
 const selectedLabels = ref<Partial<Label>[]>([]);
 
@@ -421,13 +434,13 @@ const addOrRemoveLabel = (label: Partial<Label>) => {
 
 const filteredLabelList = computed(() => {
   if (searchLabelTerm.value !== "") {
-    return labels.value.filter((label) => {
+    return labels.filter((label) => {
       return label.name
         ?.toLowerCase()
         .includes(searchLabelTerm.value.toLowerCase());
     });
   }
-  return labels.value;
+  return labels;
 });
 
 // ----------------- HANDLE INPUT---------------------------//
@@ -462,20 +475,20 @@ const submitInput = async () => {
     }
   `);
 
+  const groupId = useRoute().params.groupid;
+
   const createdTask = await sendQuery(createTaskQuery, {
     name: taskNameInput.value,
     description: descriptionInput.value,
-    groupId: useRoute().params.groupId,
-    maxWeight: weightInput,
+    groupId,
+    maxWeight: weightInput.value,
     assignees: selectedMembers.value.map((member) => member.userId),
     labels: selectedLabels.value.map((label) => label.id),
   });
 
-  // // reload user data
-  // loadUserData();
-
-  console.log(createdTask);
-  // navigateTo(`/group-${createdGroup.value?.createGroup.id}/team`);
+  if (createdTask.value?.createTask.id) {
+    navigateTo(`/group-${groupId}/tasks`);
+  }
 };
 // ----------------- SUBMIT INPUT---------------------------//
 </script>

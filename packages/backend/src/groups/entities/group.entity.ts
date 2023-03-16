@@ -1,5 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Board } from 'src/board/entities/board.entity';
+import { Label } from 'src/label/entities/label.entity';
 import { Message } from 'src/message/entities/message.entity';
 import { Task } from 'src/task/entities/task.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -54,4 +55,9 @@ export class Group {
     cascade: ['insert', 'update', 'remove'],
   })
   tasks: Task[];
+
+  @OneToMany(() => Label, (label) => label.group, {
+    cascade: ['remove', 'update'],
+  })
+  labels: Label[];
 }

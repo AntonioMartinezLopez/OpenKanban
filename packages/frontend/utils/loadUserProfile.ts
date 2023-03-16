@@ -1,5 +1,6 @@
 import { graphql } from "~~/gql/gql";
 import { useUserStore } from "~~/stores/UserStore";
+import { sendQuery } from "~~/utils/dataFetching";
 
 export async function loadUserData(): Promise<void> {
   // load relevant information

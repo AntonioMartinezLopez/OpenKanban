@@ -2,6 +2,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,6 +19,8 @@ import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TaskService {
+  private readonly logger = new Logger(TaskService.name);
+
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
