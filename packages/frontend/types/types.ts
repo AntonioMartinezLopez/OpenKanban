@@ -5,3 +5,10 @@ export interface userSession {
   iat: number;
   exp: number;
 }
+
+// Fragment data types for of graphQl data
+export type FragmentUserData = {
+  username: string;
+  userId: string;
+  email: string;
+};
