@@ -6,10 +6,13 @@
       class="grid h-12 grid-cols-6 border-b border-slate-700 bg-gray-800 subpixel-antialiased"
     >
       <div
-        class="col-span-2 ml-2 flex flex-col items-start justify-center overflow-hidden md:col-span-1"
+        class="col-span-1 ml-2 flex flex-col items-start justify-center overflow-hidden md:col-span-1"
         @click="toggleSideMenu"
       >
         <img class="h-full" src="@/assets/openkanban_logo.png" />
+      </div>
+      <div class="flex w-16 flex-col content-center items-center p-1">
+        <HeaderInteractiveLogo></HeaderInteractiveLogo>
       </div>
       <div
         class="col-span-1 hidden flex-col items-start justify-center md:flex"
@@ -19,7 +22,7 @@
       <div class="col-span-2 flex flex-col items-center justify-center">
         <input class="w-full rounded-md" />
       </div>
-      <div class="col-span-1"></div>
+      <!-- <div class="col-span-1"></div> -->
       <div class="col-span-1 mr-6 flex flex-col items-end justify-center">
         <div
           class="flex h-7 w-7 cursor-pointer flex-col items-center justify-center rounded-full border border-slate-500 bg-slate-500 hover:border-green-500"
