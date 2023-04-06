@@ -1,9 +1,24 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", "@nuxtjs/apollo"],
+  modules: [
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/apollo",
+    "@nuxtjs/google-fonts",
+  ],
   // alias: {
   //   pinia: "/node_modules/@pinia/nuxt/node_modules/pinia/dist/pinia.mjs",
   // },
+  googleFonts: {
+    download: true,
+    base64: true,
+    families: {
+      "Bebas Neue": {
+        wght: [400],
+      },
+      "Chakra Petch": true,
+    },
+  },
   pinia: {
     autoImports: [
       // automatically imports `defineStore`
@@ -26,6 +41,10 @@ export default defineNuxtConfig({
     cssPath: "~/assets/css/tailwind.css",
     config: {
       theme: {
+        fontFamily: {
+          icon: ["Bebas Neue"],
+          components: ["Chakra Petch"],
+        },
         minHeight: {
           loginBox: "300px",
         },
