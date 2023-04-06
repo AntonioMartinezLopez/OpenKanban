@@ -1,12 +1,23 @@
 <template>
-  <div ref="tiles" class="tiles">
+  <div class="flex h-full w-max flex-row flex-nowrap gap-1 overflow-hidden">
     <div
-      v-for="num in rows * cols"
-      :key="num"
-      ref="tile"
-      class="tileyolo"
-      @click="handleClick(num)"
-    ></div>
+      class="text-md font-components hidden h-full flex-col justify-items-center text-right text-lg font-extrabold md:flex"
+    >
+      <div class="max-h-[40%]">
+        <span class="w-full">OPEN</span>
+      </div>
+      <div class="max-h-[40%]"><span class="">KANBAN</span></div>
+    </div>
+    <div class="h-full w-16 p-1">
+      <div ref="tiles" class="tiles" @click="handleClick()">
+        <div
+          v-for="num in rows * cols"
+          :key="num"
+          ref="tile"
+          class="tileyolo"
+        ></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -25,13 +36,20 @@ const colors = ["rgb(33, 235, 87)", "rgb(235, 50, 33)", "rgb(33, 232, 235)"];
 const currentColor = ref(0);
 const randomColor = ref(colors[currentColor.value]);
 
-const handleClick = (index: number) => {
+const handleClick = () => {
   currentColor.value = currentColor.value + 1;
 
   $anime({
-    targets: ".tileyolo",
+    targets: ".tiles .tileyolo",
     background: colors[currentColor.value % 3],
-    delay: $anime.stagger(50, { grid: [cols.value, rows.value], from: index }),
+    scale: [
+      { value: 0.2, easing: "easeOutSine", duration: 300 },
+      { value: 1, easing: "easeInOutQuad", duration: 500 },
+    ],
+    delay: $anime.stagger(100, {
+      grid: [cols.value, rows.value],
+      from: "center",
+    }),
     duration: 3000,
   });
   // };
