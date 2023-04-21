@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Label {
+  """Label Id"""
+  id: String!
+
+  """The name of the label"""
+  name: String!
+
+  """Color of the label"""
+  color: String!
+}
+
 type Task {
   """Task Id"""
   id: String!
@@ -29,17 +40,6 @@ type Boardcolumn {
   tasks: [Task!]!
 }
 
-type Label {
-  """Label Id"""
-  id: String!
-
-  """The name of the label"""
-  name: String!
-
-  """Color of the label"""
-  color: String!
-}
-
 type Board {
   """Board id"""
   id: String!
@@ -50,8 +50,6 @@ type Board {
   """The desciription of the user"""
   description: String!
   columns: [Boardcolumn!]!
-  tasks: [Task!]!
-  labels: [Label!]!
 }
 
 type Message {
@@ -79,6 +77,8 @@ type Group {
   creator: User
   users: [User!]
   board: Board
+  tasks: [Task!]!
+  labels: [Label!]!
   messages: [Message!]!
 }
 
@@ -117,6 +117,7 @@ type Query {
   board(id: String!): Board!
   task(id: String!): Task!
   boardcolumn(id: String!): Boardcolumn!
+  labels: [Label!]!
   label(id: String!): Label!
   message(groupId: String!): [Message!]!
   tasklog(id: Int!): Tasklog!
@@ -248,11 +249,14 @@ input CreateTaskInput {
   """Calculated weight of a task"""
   maxWeight: Int
 
-  """Board Id"""
-  boardId: String!
+  """Group Id"""
+  groupId: String!
 
-  """Board Id"""
+  """assignees"""
   assignees: [String!]!
+
+  """labels"""
+  labels: [String!]!
 }
 
 input UpdateTaskInput {
@@ -265,11 +269,14 @@ input UpdateTaskInput {
   """Calculated weight of a task"""
   maxWeight: Int
 
-  """Board Id"""
-  boardId: String
+  """Group Id"""
+  groupId: String
 
   """Board Id"""
   assignees: [String!]!
+
+  """Labels"""
+  labels: [String!]!
 
   """Task Id"""
   id: String!
@@ -313,8 +320,8 @@ input CreateLabelInput {
   """color of the label"""
   color: String!
 
-  """id of the corresponding board"""
-  boardId: String!
+  """id of the corresponding group"""
+  groupId: String!
 }
 
 input UpdateLabelInput {
@@ -324,8 +331,8 @@ input UpdateLabelInput {
   """color of the label"""
   color: String!
 
-  """id of the corresponding board"""
-  boardId: String
+  """id of the corresponding group"""
+  groupId: String
 
   """id of the label"""
   labelId: String!

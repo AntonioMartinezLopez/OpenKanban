@@ -2,11 +2,14 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Board } from 'src/board/entities/board.entity';
 import { BoardcolumnService } from 'src/boardcolumn/boardcolumn.service';
+import { Group } from 'src/groups/entities/group.entity';
+import { Label } from 'src/label/entities/label.entity';
+import { LabelService } from 'src/label/label.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
@@ -16,24 +19,28 @@ import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TaskService {
+  private readonly logger = new Logger(TaskService.name);
+
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
-    @InjectRepository(Board)
-    private boardRepository: Repository<Board>,
+    @InjectRepository(Group)
+    private groupRepository: Repository<Group>,
     @Inject(forwardRef(() => BoardcolumnService))
     private boardColumnService: BoardcolumnService,
     @Inject(UserService)
     private userService: UserService,
+    @Inject(LabelService)
+    private labelService: LabelService,
   ) {}
 
   async create(createTaskInput: CreateTaskInput) {
     // search for board
-    const board = await this.boardRepository.findOneBy({
-      id: createTaskInput.boardId,
+    const group = await this.groupRepository.findOneBy({
+      id: createTaskInput.groupId,
     });
 
-    if (!board) {
+    if (!group) {
       throw new NotFoundException('Unknown board Id');
     }
 
@@ -48,12 +55,24 @@ export class TaskService {
       users.push(userFound);
     }
 
+    // search for labels
+    const labels = [] as Label[];
+    for (const labelId of createTaskInput.labels) {
+      const labelFound = await this.labelService.findOne(labelId);
+      if (!labelFound) {
+        throw new NotFoundException('Unknown label Id');
+      }
+
+      labels.push(labelFound);
+    }
+
     const newTask = new Task();
     newTask.name = createTaskInput.name;
     newTask.description = createTaskInput.description;
     newTask.weight = createTaskInput.maxWeight;
-    newTask.board = board;
+    newTask.group = group;
     newTask.assignees = users;
+    newTask.labels = labels;
 
     return this.taskRepository.save(newTask);
   }
@@ -70,7 +89,7 @@ export class TaskService {
   }
 
   async update(updateTaskInput: UpdateTaskInput) {
-    const { id, assignees, ...props } = updateTaskInput;
+    const { id, assignees, labels, ...props } = updateTaskInput;
 
     let task = await this.taskRepository.findOneBy({ id: id });
 
@@ -89,7 +108,18 @@ export class TaskService {
       assignedUsers.push(userFound);
     }
 
-    task = { ...task, ...props, assignees: assignedUsers };
+    // search for labels
+    const newLabels = [] as Label[];
+    for (const labelId of updateTaskInput.labels) {
+      const labelFound = await this.labelService.findOne(labelId);
+      if (!labelFound) {
+        throw new NotFoundException('Unknown label Id');
+      }
+
+      newLabels.push(labelFound);
+    }
+
+    task = { ...task, ...props, assignees: assignedUsers, labels: newLabels };
 
     // check if new column was set
     if (updateTaskInput.boardColumnId) {

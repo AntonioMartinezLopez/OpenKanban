@@ -1,6 +1,13 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { Board } from 'src/board/entities/board.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Group } from 'src/groups/entities/group.entity';
+import { Task } from 'src/task/entities/task.entity';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 @ObjectType()
@@ -17,9 +24,11 @@ export class Label {
   @Field({ description: 'Color of the label' })
   color: string;
 
-  @ManyToOne(() => Board, (board) => board.labels, {
+  @ManyToOne(() => Group, (group) => group.labels, {
     onDelete: 'CASCADE',
-    cascade: ['insert'],
   })
-  board: Board;
+  group: Group;
+
+  @ManyToMany(() => Task, (task) => task.labels, { onDelete: 'CASCADE' })
+  tasks: Task[];
 }

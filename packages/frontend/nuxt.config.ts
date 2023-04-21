@@ -1,9 +1,22 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", "@nuxtjs/apollo"],
+  modules: [
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/apollo",
+    "@nuxtjs/google-fonts",
+  ],
   // alias: {
   //   pinia: "/node_modules/@pinia/nuxt/node_modules/pinia/dist/pinia.mjs",
   // },
+  googleFonts: {
+    download: true,
+    base64: true,
+    families: {
+      Ubuntu: true,
+      Saira: true,
+    },
+  },
   pinia: {
     autoImports: [
       // automatically imports `defineStore`
@@ -26,6 +39,10 @@ export default defineNuxtConfig({
     cssPath: "~/assets/css/tailwind.css",
     config: {
       theme: {
+        fontFamily: {
+          components: ["Ubuntu"],
+          icon: ["Saira"],
+        },
         minHeight: {
           loginBox: "300px",
         },
@@ -39,6 +56,7 @@ export default defineNuxtConfig({
           },
           transitionProperty: {
             height: "height",
+            width: "width",
           },
         },
       },

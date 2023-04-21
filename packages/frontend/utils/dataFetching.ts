@@ -19,20 +19,19 @@ export async function sendQuery<T>(
     const { onLogin } = useApollo();
     const authStore = useAuth();
 
-    const query = graphql(`
+    const authQuery = graphql(`
       query refreshToken {
         refreshToken {
           access_token
         }
       }
     `);
-    const { data: refreshData } = await useAsyncQuery(query, {});
-
+    const { data: refreshData } = await useAsyncQuery(authQuery, {});
     // if refreshing access token was succesful, save new session and continue
-    if (refreshData.value?.refreshToken) {
+    if (refreshData.value?.refreshToken?.access_token) {
       const newAccessToken = refreshData.value.refreshToken.access_token;
       // save new token in apollo client
-      onLogin(newAccessToken);
+      await onLogin(newAccessToken);
 
       // save user info in store
       authStore.setSession(jwtDecode(newAccessToken));
@@ -40,9 +39,8 @@ export async function sendQuery<T>(
 
       // repeat the query
       const { data: newTryData } = await useAsyncQuery(query, variables);
-
       if (newTryData.value) {
-        return data;
+        return newTryData;
       } else {
         logOut();
       }

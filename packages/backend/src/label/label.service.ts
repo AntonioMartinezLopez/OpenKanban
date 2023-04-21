@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BoardService } from 'src/board/board.service';
+import { GroupsService } from 'src/groups/groups.service';
 import { Repository } from 'typeorm';
 import { CreateLabelInput } from './dto/create-label.input';
 import { UpdateLabelInput } from './dto/update-label.input';
@@ -16,25 +16,29 @@ export class LabelService {
   constructor(
     @InjectRepository(Label)
     private labelRepository: Repository<Label>,
-    @Inject(forwardRef(() => BoardService))
-    private boardService: BoardService,
+    @Inject(forwardRef(() => GroupsService))
+    private groupService: GroupsService,
   ) {}
 
   async create(createLabelInput: CreateLabelInput) {
     // search for existing board
-    const { boardId, ...boardProps } = createLabelInput;
-    const board = await this.boardService.findOne(boardId);
+    const { groupId, ...boardProps } = createLabelInput;
+    const group = await this.groupService.findOnebyId(groupId);
 
-    if (!board) {
-      throw new NotFoundException('Unknown board id');
+    if (!group) {
+      throw new NotFoundException('Unknown group id');
     }
 
     const newLabel = new Label();
     newLabel.name = boardProps.name;
     newLabel.color = boardProps.color;
-    newLabel.board = board;
+    newLabel.group = group;
 
     return this.labelRepository.save(newLabel);
+  }
+
+  findAll() {
+    return this.labelRepository.find();
   }
 
   async findOne(labelId: string) {
