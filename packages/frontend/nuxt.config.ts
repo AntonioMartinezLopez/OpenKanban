@@ -13,10 +13,8 @@ export default defineNuxtConfig({
     download: true,
     base64: true,
     families: {
-      "Bebas Neue": {
-        wght: [400],
-      },
-      "Chakra Petch": true,
+      Ubuntu: true,
+      Saira: true,
     },
   },
   pinia: {
@@ -42,8 +40,8 @@ export default defineNuxtConfig({
     config: {
       theme: {
         fontFamily: {
-          icon: ["Bebas Neue"],
-          components: ["Chakra Petch"],
+          components: ["Ubuntu"],
+          icon: ["Saira"],
         },
         minHeight: {
           loginBox: "300px",

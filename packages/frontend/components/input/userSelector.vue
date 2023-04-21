@@ -2,7 +2,7 @@
   <div
     class="duration-600 relative row-span-2 flex flex-col content-center items-start p-2 transition-all"
   >
-    <h3 class="w-full text-lg">Assignees</h3>
+    <h3 class="w-full text-lg">{{ props.title }}</h3>
     <input
       v-model="searchedMember"
       class="duration-400 h-7 w-full max-w-[15rem] resize-none rounded-md border border-gray-600 border-transparent bg-slate-800 p-1 text-base text-gray-400 outline-none transition-all ease-in focus:border-2 focus:border-green-500 focus:shadow-md focus:shadow-green-400/70 focus:outline-none"
@@ -124,6 +124,12 @@ const props = defineProps({
       return [];
     },
     description: "selected labels",
+  },
+  title: {
+    type: String,
+    default() {
+      return "Users";
+    },
   },
 });
 

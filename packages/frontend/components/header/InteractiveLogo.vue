@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full w-max flex-row flex-nowrap gap-1 overflow-hidden">
     <div
-      class="text-md font-components hidden h-full flex-col justify-items-center text-right text-lg font-extrabold md:flex"
+      class="font-icon hidden h-full flex-col justify-items-center text-right text-lg font-black md:flex"
     >
       <div class="max-h-[40%]">
         <span class="w-full">OPEN</span>

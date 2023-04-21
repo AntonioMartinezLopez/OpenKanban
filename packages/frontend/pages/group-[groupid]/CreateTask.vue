@@ -69,6 +69,7 @@
       <InputUserSelector
         v-model="selectedMembers"
         :users="users"
+        title="Assignees"
       ></InputUserSelector>
       <div
         class="row-span-1 mr-2 flex h-full w-full flex-row items-center justify-end gap-7 border-t-2 border-t-gray-500 pt-2"
@@ -104,32 +105,36 @@ const router = useRouter();
 
 // -----------------FETCH DATA----------------------------//
 
-// fetch all users that can be selected
-// fetch name of all groups
-const queryUsers = graphql(`
-  query users {
-    users {
-      username
-      userId
-      email
-    }
-  }
-`);
-const userData = await sendQuery(queryUsers, {});
-const users: FragmentUserData[] = userData.value ? userData.value.users : [];
-
-// fetch label data
-const queryLabels = graphql(`
-  query labels {
-    labels {
-      id
+const groupQuery = graphql(`
+  query group($id: String!) {
+    group(id: $id) {
       name
-      color
+      users {
+        userId
+        username
+        email
+      }
+      labels {
+        id
+        name
+        color
+      }
     }
   }
 `);
-const labelData = await sendQuery(queryLabels, {});
-const labels = labelData.value ? labelData.value.labels : [];
+const queryData = await sendQuery(groupQuery, {
+  id: useRoute().params.groupid,
+});
+
+// extract users
+const users: FragmentUserData[] = queryData.value?.group?.users
+  ? queryData.value.group?.users
+  : [];
+
+// extract label data
+const labels = queryData.value?.group?.labels
+  ? queryData.value?.group?.labels
+  : [];
 // -----------------FETCH DATA----------------------------//
 //
 // ----------------- HANDLE INPUT---------------------------//

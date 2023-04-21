@@ -21,7 +21,28 @@
         class="ml-1 flex h-7 w-7 select-none flex-col items-center justify-center rounded-full border border-transparent bg-gray-700 text-base font-bold text-gray-400 hover:cursor-pointer hover:border hover:border-gray-400 hover:opacity-80"
         @click="labelOptionsOpened = !labelOptionsOpened"
       >
-        <span class="m-auto h-[50%] leading-3">+</span>
+        <span v-if="!labelOptionsOpened" class="m-auto h-[50%] leading-3"
+          >+</span
+        >
+        <svg
+          v-else
+          version="1.1"
+          viewBox="0 0 330 330"
+          xml:space="preserve"
+          class="w-[40%] fill-slate-400"
+        >
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          ></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M325.606,229.393l-150.004-150C172.79,76.58,168.974,75,164.996,75c-3.979,0-7.794,1.581-10.607,4.394 l-149.996,150c-5.858,5.858-5.858,15.355,0,21.213c5.857,5.857,15.355,5.858,21.213,0l139.39-139.393l139.397,139.393 C307.322,253.536,311.161,255,315,255c3.839,0,7.678-1.464,10.607-4.394C331.464,244.748,331.464,235.251,325.606,229.393z"
+            ></path>
+          </g>
+        </svg>
       </div>
 
       <div
