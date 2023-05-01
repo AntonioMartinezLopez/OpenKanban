@@ -11,6 +11,8 @@ import { Task } from './entities/task.entity';
 import { CreateTaskInput } from './dto/create-task.input';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { User } from 'src/user/entities/user.entity';
+import { QueryTasksInput, QueryTasksResult } from './dto/query-tasks.input';
+import { Label } from 'src/label/entities/label.entity';
 
 @Resolver(() => Task)
 export class TaskResolver {
@@ -25,6 +27,12 @@ export class TaskResolver {
   // findAll() {
   //   return this.taskService.findAll();
   // }
+  @Query(() => QueryTasksResult)
+  loadTasksfromBoard(
+    @Args('queryTasksInput') queryTasksInput: QueryTasksInput,
+  ) {
+    return this.taskService.findAllTaskFromBoardColumn(queryTasksInput);
+  }
 
   @Query(() => Task, { name: 'task' })
   findOne(@Args('id') id: string) {
@@ -45,5 +53,11 @@ export class TaskResolver {
   async assignees(@Parent() task: Task): Promise<User[]> {
     const { id } = task;
     return this.taskService.getAssignees(id);
+  }
+
+  @ResolveField(() => [Label])
+  async labels(@Parent() task: Task): Promise<Label[]> {
+    const { id } = task;
+    return this.taskService.getLabels(id);
   }
 }

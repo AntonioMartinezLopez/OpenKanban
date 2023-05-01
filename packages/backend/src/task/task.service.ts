@@ -14,6 +14,7 @@ import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { CreateTaskInput } from './dto/create-task.input';
+import { QueryTasksInput, QueryTasksResult } from './dto/query-tasks.input';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { Task } from './entities/task.entity';
 
@@ -77,12 +78,29 @@ export class TaskService {
     return this.taskRepository.save(newTask);
   }
 
-  // async findAllTaskFromBoard(boardId: string) {
-  //   return this.taskRepository.find({
-  //     relations: ['board'],
-  //     where: { board: { id: boardId } },
-  //   });
-  // }
+  async findAllTaskFromBoardColumn(queryTaskInput: QueryTasksInput) {
+    // fetch all data from board
+    const tasks = await this.taskRepository.find({
+      relations: ['boardColumn', 'group'],
+      where: {
+        boardColumn: { name: queryTaskInput.boardColumnName },
+        group: {
+          id: queryTaskInput.groupId,
+        },
+      },
+    });
+
+    // cut the result based on given pageSize and page number
+    const start = queryTaskInput.page * queryTaskInput.pageSize;
+    const end = start + queryTaskInput.pageSize;
+
+    const result = new QueryTasksResult();
+    result.tasks = tasks.slice(start, end);
+    result.hasMore = end < tasks.length;
+
+    console.error(JSON.stringify(result));
+    return result;
+  }
 
   findOne(taskId: string) {
     return this.taskRepository.findOneBy({ id: taskId });
@@ -152,5 +170,14 @@ export class TaskService {
     });
 
     return task.assignees;
+  }
+
+  async getLabels(taskid: string): Promise<Label[]> {
+    const task = await this.taskRepository.findOne({
+      relations: ['labels'],
+      where: { id: taskid },
+    });
+
+    return task.labels;
   }
 }

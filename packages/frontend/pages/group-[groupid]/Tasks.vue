@@ -180,9 +180,77 @@
 
 <script setup lang="ts">
 // definePageMeta({ middleware: "auth" });
+
+import { graphql } from "~~/gql/gql";
+
 // const routeParams = useRoute().params;
 const route = useRoute();
 const groupRoute = computed(() => {
   return route.params.groupid ? (route.params.groupid as string) : "";
 });
+
+interface LoadedTasks {
+  id: string;
+  name: string;
+  description: string;
+  weight: number;
+  assignees: {
+    username: string;
+    userId: string;
+    email: string;
+  }[];
+  labels: {
+    name: string;
+    color: string;
+    id: string;
+  }[];
+}
+
+const loadedTasks = {} as Record<string, LoadedTasks[] | undefined>;
+// -----------------FETCH DATA----------------------------//
+for (const x of ["OPEN", "SELECTED", "CLOSED"]) {
+  const taskQuery = graphql(`
+    query loadTasksfromBoard(
+      $groupId: String!
+      $boardColumnName: String!
+      $page: Int!
+      $pageSize: Int!
+    ) {
+      loadTasksfromBoard(
+        queryTasksInput: {
+          groupId: $groupId
+          boardColumnName: $boardColumnName
+          page: $page
+          pageSize: $pageSize
+        }
+      ) {
+        hasMore
+        tasks {
+          id
+          name
+          description
+          weight
+          assignees {
+            username
+            userId
+            email
+          }
+          labels {
+            name
+            color
+            id
+          }
+        }
+      }
+    }
+  `);
+  const queryData = await sendQuery(taskQuery, {
+    groupId: useRoute().params.groupid,
+    boardColumnName: x,
+    page: 0,
+    pageSize: 10,
+  });
+
+  loadedTasks[x] = queryData.value?.loadTasksfromBoard.tasks;
+}
 </script>

@@ -26,6 +26,7 @@ type Task {
   """Calculated weight of a task"""
   weight: Int!
   assignees: [User!]!
+  labels: [Label!]!
 }
 
 type Boardcolumn {
@@ -99,6 +100,11 @@ type LoginResult {
   access_token: String!
 }
 
+type QueryTasksResult {
+  tasks: [Task!]!
+  hasMore: Boolean!
+}
+
 type Tasklog {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -115,6 +121,7 @@ type Query {
   group(id: String, name: String): Group
   boards: [Board!]!
   board(id: String!): Board!
+  loadTasksfromBoard(queryTasksInput: QueryTasksInput!): QueryTasksResult!
   task(id: String!): Task!
   boardcolumn(id: String!): Boardcolumn!
   labels: [Label!]!
@@ -129,6 +136,19 @@ input LoginUserInput {
 
   """Example field (placeholder)"""
   password: String!
+}
+
+input QueryTasksInput {
+  groupId: String!
+
+  """The name of the task"""
+  boardColumnName: String!
+
+  """Description of the task"""
+  page: Int!
+
+  """Description of the task"""
+  pageSize: Int!
 }
 
 type Mutation {
