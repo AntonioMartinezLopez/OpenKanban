@@ -10,6 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardService } from 'src/board/board.service';
 import { Board } from 'src/board/entities/board.entity';
+import { Boardcolumn } from 'src/boardcolumn/entities/boardcolumn.entity';
 import { Label } from 'src/label/entities/label.entity';
 import { Message } from 'src/message/entities/message.entity';
 import { Task } from 'src/task/entities/task.entity';
@@ -57,10 +58,18 @@ export class GroupsService {
       newGroup.creator = user;
 
       // direct initialization of a board
-      if (createGroupInput.boardname && createGroupInput.boardDescription) {
+      if (createGroupInput.boardName) {
         const newBoard = new Board();
-        newBoard.name = createGroupInput.boardname;
-        newBoard.description = createGroupInput.boardDescription;
+        newBoard.name = createGroupInput.boardName;
+        newBoard.description = createGroupInput.boardDescription
+          ? createGroupInput.boardDescription
+          : '';
+
+        // initialize the default columns "OPEN" and "CLOSED"
+        const openColumn = new Boardcolumn('OPEN', false);
+        const closedColumn = new Boardcolumn('CLOSED', false);
+        newBoard.columns = [openColumn, closedColumn];
+
         newGroup.board = newBoard;
       }
 
@@ -131,7 +140,10 @@ export class GroupsService {
   }
 
   findOnebyId(groupId: string): Promise<Group> {
-    return this.groupRepository.findOneBy({ id: groupId });
+    return this.groupRepository.findOne({
+      relations: ['board'],
+      where: { id: groupId },
+    });
   }
 
   findOnebyName(groupName: string): Promise<Group> {

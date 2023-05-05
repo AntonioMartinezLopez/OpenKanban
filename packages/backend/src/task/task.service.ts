@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardcolumnService } from 'src/boardcolumn/boardcolumn.service';
-import { Group } from 'src/groups/entities/group.entity';
+import { GroupsService } from 'src/groups/groups.service';
 import { Label } from 'src/label/entities/label.entity';
 import { LabelService } from 'src/label/label.service';
 import { User } from 'src/user/entities/user.entity';
@@ -25,8 +25,8 @@ export class TaskService {
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
-    @InjectRepository(Group)
-    private groupRepository: Repository<Group>,
+    @Inject(GroupsService)
+    private groupService: GroupsService,
     @Inject(forwardRef(() => BoardcolumnService))
     private boardColumnService: BoardcolumnService,
     @Inject(UserService)
@@ -37,10 +37,8 @@ export class TaskService {
 
   async create(createTaskInput: CreateTaskInput) {
     // search for board
-    const group = await this.groupRepository.findOneBy({
-      id: createTaskInput.groupId,
-    });
 
+    const group = await this.groupService.findOnebyId(createTaskInput.groupId);
     if (!group) {
       throw new NotFoundException('Unknown board Id');
     }
@@ -74,6 +72,12 @@ export class TaskService {
     newTask.group = group;
     newTask.assignees = users;
     newTask.labels = labels;
+
+    // set new Task to corresponding OPEN Column
+    const openColumn = await this.boardColumnService.findStartingColumn(
+      group.board.id,
+    );
+    newTask.boardColumn = openColumn;
 
     return this.taskRepository.save(newTask);
   }

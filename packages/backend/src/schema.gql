@@ -36,6 +36,9 @@ type Boardcolumn {
   """The name of the Column"""
   name: String!
 
+  """Flag describing whether a column can be deleted or not"""
+  canBeDeleted: Boolean!
+
   """Maximum weight the column can hold"""
   maxWeight: Int!
   tasks: [Task!]!
@@ -214,7 +217,7 @@ input CreateGroupInput {
   userId: String!
 
   """The name of the board"""
-  boardname: String
+  boardName: String
 
   """The description of the board"""
   boardDescription: String

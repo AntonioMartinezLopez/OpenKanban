@@ -12,7 +12,7 @@ export class CreateGroupInput {
   userId: string;
 
   @Field(() => String, { description: 'The name of the board', nullable: true })
-  boardname: string;
+  boardName: string;
 
   @Field(() => String, {
     description: 'The description of the board',
