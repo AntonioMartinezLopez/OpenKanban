@@ -32,8 +32,9 @@
     <div class="grid h-full w-full grid-cols-3 gap-4 pt-4">
       <!-- OPEN TASKS -->
       <div
-        class="col-span-3 rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
+        class="col-span-3 flex flex-col rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
       >
+        <!-- HEADER -->
         <div
           class="flex h-12 w-full flex-row items-center justify-end gap-2 rounded-t-md border-b border-gray-500 bg-slate-800 p-2"
         >
@@ -76,6 +77,13 @@
 
             <span>36</span>
           </div>
+        </div>
+        <div class="tt-3 h-full overflow-y-auto bg-transparent pl-3 pr-3 pt-3">
+          <TaskItemCard
+            v-for="(task, index) in loadedTasks['OPEN']"
+            :key="`Task-${index}`"
+            :task="task"
+          ></TaskItemCard>
         </div>
       </div>
       <!-- SELECTED TASKS -->
@@ -182,29 +190,13 @@
 // definePageMeta({ middleware: "auth" });
 
 import { graphql } from "~~/gql/gql";
+import { LoadedTasks } from "~~/types/types";
 
 // const routeParams = useRoute().params;
 const route = useRoute();
 const groupRoute = computed(() => {
   return route.params.groupid ? (route.params.groupid as string) : "";
 });
-
-interface LoadedTasks {
-  id: string;
-  name: string;
-  description: string;
-  weight: number;
-  assignees: {
-    username: string;
-    userId: string;
-    email: string;
-  }[];
-  labels: {
-    name: string;
-    color: string;
-    id: string;
-  }[];
-}
 
 const loadedTasks = {} as Record<string, LoadedTasks[] | undefined>;
 // -----------------FETCH DATA----------------------------//

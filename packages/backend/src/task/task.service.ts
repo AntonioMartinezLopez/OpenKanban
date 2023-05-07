@@ -102,7 +102,6 @@ export class TaskService {
     result.tasks = tasks.slice(start, end);
     result.hasMore = end < tasks.length;
 
-    console.error(JSON.stringify(result));
     return result;
   }
 

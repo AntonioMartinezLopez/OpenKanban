@@ -65,10 +65,11 @@ export class GroupsService {
           ? createGroupInput.boardDescription
           : '';
 
-        // initialize the default columns "OPEN" and "CLOSED"
+        // initialize the default columns "OPEN", "CLOSED" and "SELECTED"
         const openColumn = new Boardcolumn('OPEN', false);
         const closedColumn = new Boardcolumn('CLOSED', false);
-        newBoard.columns = [openColumn, closedColumn];
+        const selectedColumn = new Boardcolumn('SELECTED', false);
+        newBoard.columns = [openColumn, closedColumn, selectedColumn];
 
         newGroup.board = newBoard;
       }
@@ -169,7 +170,6 @@ export class GroupsService {
       where: { id: groupId },
     });
 
-    this.logger.log(JSON.stringify(group));
     if (!group) {
       throw new NotFoundException('Unknown Group Id');
     }

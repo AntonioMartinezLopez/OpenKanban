@@ -93,6 +93,12 @@ type User {
   """The name of the user"""
   username: String!
 
+  """First name of the user"""
+  firstName: String!
+
+  """Last name of the user"""
+  lastName: String!
+
   """The email of the user"""
   email: String!
   groups: [Group!]!
@@ -184,8 +190,14 @@ type Mutation {
 }
 
 input CreateUserInput {
-  """Field for name of the new user"""
+  """Field for username of the new user"""
   username: String!
+
+  """Field for first name of the new user"""
+  firstName: String!
+
+  """Field for last name of the new user"""
+  lastName: String!
 
   """Field for the email address of the new suer"""
   email: String!
@@ -197,6 +209,12 @@ input CreateUserInput {
 input UpdateUserInput {
   """Field for name of the new user"""
   username: String
+
+  """Field for first name of the new user"""
+  firstName: String
+
+  """Field for last name of the new user"""
+  lastName: String
 
   """Field for the email address of the new user"""
   email: String

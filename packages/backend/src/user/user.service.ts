@@ -32,6 +32,8 @@ export class UserService {
       const newUser = new User();
       newUser.username = createUserInput.username;
       newUser.email = createUserInput.email;
+      newUser.firstName = createUserInput.firstName;
+      newUser.lastName = createUserInput.lastName;
       newUser.refreshToken = [];
 
       // hash and set password

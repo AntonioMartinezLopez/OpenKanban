@@ -16,6 +16,14 @@ export class User {
   username: string;
 
   @Column('text')
+  @Field({ description: 'First name of the user' })
+  firstName: string;
+
+  @Column('text')
+  @Field({ description: 'Last name of the user' })
+  lastName: string;
+
+  @Column('text')
   @Field({ description: 'The email of the user' })
   email: string;
 
