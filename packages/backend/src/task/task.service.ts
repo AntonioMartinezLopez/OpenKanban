@@ -12,7 +12,7 @@ import { Label } from 'src/label/entities/label.entity';
 import { LabelService } from 'src/label/label.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { CreateTaskInput } from './dto/create-task.input';
 import { QueryTasksInput, QueryTasksResult } from './dto/query-tasks.input';
 import { UpdateTaskInput } from './dto/update-task.input';
@@ -82,12 +82,37 @@ export class TaskService {
     return this.taskRepository.save(newTask);
   }
 
-  async findAllTaskFromBoardColumn(queryTaskInput: QueryTasksInput) {
+  // returns all task of a given column name
+  async findAllTasksFromBoardColumn(queryTaskInput: QueryTasksInput) {
     // fetch all data from board
     const tasks = await this.taskRepository.find({
       relations: ['boardColumn', 'group'],
       where: {
         boardColumn: { name: queryTaskInput.boardColumnName },
+        group: {
+          id: queryTaskInput.groupId,
+        },
+      },
+    });
+
+    // cut the result based on given pageSize and page number
+    const start = queryTaskInput.page * queryTaskInput.pageSize;
+    const end = start + queryTaskInput.pageSize;
+
+    const result = new QueryTasksResult();
+    result.tasks = tasks.slice(start, end);
+    result.hasMore = end < tasks.length;
+
+    return result;
+  }
+
+  // returns all task that are assigned to a column that is not OPEN or CLOSED
+  async findAllSelectedTasks(queryTaskInput: QueryTasksInput) {
+    // fetch all data from board
+    const tasks = await this.taskRepository.find({
+      relations: ['boardColumn', 'group'],
+      where: {
+        boardColumn: { name: Not(In(['OPEN', 'CLOSED'])) },
         group: {
           id: queryTaskInput.groupId,
         },

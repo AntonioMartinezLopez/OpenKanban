@@ -78,7 +78,9 @@
             <span>36</span>
           </div>
         </div>
-        <div class="tt-3 h-full overflow-y-auto bg-transparent pl-3 pr-3 pt-3">
+        <div
+          class="flex h-full flex-col gap-3 overflow-y-auto bg-transparent pl-3 pr-3 pt-3"
+        >
           <TaskItemCard
             v-for="(task, index) in loadedTasks['OPEN']"
             :key="`Task-${index}`"
@@ -223,6 +225,8 @@ for (const x of ["OPEN", "SELECTED", "CLOSED"]) {
           description
           weight
           assignees {
+            firstName
+            lastName
             username
             userId
             email

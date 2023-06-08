@@ -31,7 +31,7 @@ export class TaskResolver {
   loadTasksfromBoard(
     @Args('queryTasksInput') queryTasksInput: QueryTasksInput,
   ) {
-    return this.taskService.findAllTaskFromBoardColumn(queryTasksInput);
+    return this.taskService.findAllTasksFromBoardColumn(queryTasksInput);
   }
 
   @Query(() => Task, { name: 'task' })

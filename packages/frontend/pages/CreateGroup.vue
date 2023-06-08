@@ -101,6 +101,8 @@ const groupNames = groupData.value
 const queryUsers = graphql(`
   query users {
     users {
+      firstName
+      lastName
       username
       userId
       email
