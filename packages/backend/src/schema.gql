@@ -26,6 +26,7 @@ type Task {
   """Calculated weight of a task"""
   weight: Int!
   assignees: [User!]!
+  labels: [Label!]!
 }
 
 type Boardcolumn {
@@ -34,6 +35,9 @@ type Boardcolumn {
 
   """The name of the Column"""
   name: String!
+
+  """Flag describing whether a column can be deleted or not"""
+  canBeDeleted: Boolean!
 
   """Maximum weight the column can hold"""
   maxWeight: Int!
@@ -89,6 +93,12 @@ type User {
   """The name of the user"""
   username: String!
 
+  """First name of the user"""
+  firstName: String!
+
+  """Last name of the user"""
+  lastName: String!
+
   """The email of the user"""
   email: String!
   groups: [Group!]!
@@ -97,6 +107,11 @@ type User {
 type LoginResult {
   """Example field (placeholder)"""
   access_token: String!
+}
+
+type QueryTasksResult {
+  tasks: [Task!]!
+  hasMore: Boolean!
 }
 
 type Tasklog {
@@ -115,6 +130,7 @@ type Query {
   group(id: String, name: String): Group
   boards: [Board!]!
   board(id: String!): Board!
+  loadTasksfromBoard(queryTasksInput: QueryTasksInput!): QueryTasksResult!
   task(id: String!): Task!
   boardcolumn(id: String!): Boardcolumn!
   labels: [Label!]!
@@ -129,6 +145,19 @@ input LoginUserInput {
 
   """Example field (placeholder)"""
   password: String!
+}
+
+input QueryTasksInput {
+  groupId: String!
+
+  """The name of the task"""
+  boardColumnName: String!
+
+  """Description of the task"""
+  page: Int!
+
+  """Description of the task"""
+  pageSize: Int!
 }
 
 type Mutation {
@@ -161,8 +190,14 @@ type Mutation {
 }
 
 input CreateUserInput {
-  """Field for name of the new user"""
+  """Field for username of the new user"""
   username: String!
+
+  """Field for first name of the new user"""
+  firstName: String!
+
+  """Field for last name of the new user"""
+  lastName: String!
 
   """Field for the email address of the new suer"""
   email: String!
@@ -174,6 +209,12 @@ input CreateUserInput {
 input UpdateUserInput {
   """Field for name of the new user"""
   username: String
+
+  """Field for first name of the new user"""
+  firstName: String
+
+  """Field for last name of the new user"""
+  lastName: String
 
   """Field for the email address of the new user"""
   email: String
@@ -194,7 +235,7 @@ input CreateGroupInput {
   userId: String!
 
   """The name of the board"""
-  boardname: String
+  boardName: String
 
   """The description of the board"""
   boardDescription: String

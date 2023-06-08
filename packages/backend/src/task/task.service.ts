@@ -7,13 +7,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardcolumnService } from 'src/boardcolumn/boardcolumn.service';
-import { Group } from 'src/groups/entities/group.entity';
+import { GroupsService } from 'src/groups/groups.service';
 import { Label } from 'src/label/entities/label.entity';
 import { LabelService } from 'src/label/label.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { CreateTaskInput } from './dto/create-task.input';
+import { QueryTasksInput, QueryTasksResult } from './dto/query-tasks.input';
 import { UpdateTaskInput } from './dto/update-task.input';
 import { Task } from './entities/task.entity';
 
@@ -24,8 +25,8 @@ export class TaskService {
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
-    @InjectRepository(Group)
-    private groupRepository: Repository<Group>,
+    @Inject(GroupsService)
+    private groupService: GroupsService,
     @Inject(forwardRef(() => BoardcolumnService))
     private boardColumnService: BoardcolumnService,
     @Inject(UserService)
@@ -36,10 +37,8 @@ export class TaskService {
 
   async create(createTaskInput: CreateTaskInput) {
     // search for board
-    const group = await this.groupRepository.findOneBy({
-      id: createTaskInput.groupId,
-    });
 
+    const group = await this.groupService.findOnebyId(createTaskInput.groupId);
     if (!group) {
       throw new NotFoundException('Unknown board Id');
     }
@@ -74,15 +73,62 @@ export class TaskService {
     newTask.assignees = users;
     newTask.labels = labels;
 
+    // set new Task to corresponding OPEN Column
+    const openColumn = await this.boardColumnService.findStartingColumn(
+      group.board.id,
+    );
+    newTask.boardColumn = openColumn;
+
     return this.taskRepository.save(newTask);
   }
 
-  // async findAllTaskFromBoard(boardId: string) {
-  //   return this.taskRepository.find({
-  //     relations: ['board'],
-  //     where: { board: { id: boardId } },
-  //   });
-  // }
+  // returns all task of a given column name
+  async findAllTasksFromBoardColumn(queryTaskInput: QueryTasksInput) {
+    // fetch all data from board
+    const tasks = await this.taskRepository.find({
+      relations: ['boardColumn', 'group'],
+      where: {
+        boardColumn: { name: queryTaskInput.boardColumnName },
+        group: {
+          id: queryTaskInput.groupId,
+        },
+      },
+    });
+
+    // cut the result based on given pageSize and page number
+    const start = queryTaskInput.page * queryTaskInput.pageSize;
+    const end = start + queryTaskInput.pageSize;
+
+    const result = new QueryTasksResult();
+    result.tasks = tasks.slice(start, end);
+    result.hasMore = end < tasks.length;
+
+    return result;
+  }
+
+  // returns all task that are assigned to a column that is not OPEN or CLOSED
+  async findAllSelectedTasks(queryTaskInput: QueryTasksInput) {
+    // fetch all data from board
+    const tasks = await this.taskRepository.find({
+      relations: ['boardColumn', 'group'],
+      where: {
+        boardColumn: { name: Not(In(['OPEN', 'CLOSED'])) },
+        group: {
+          id: queryTaskInput.groupId,
+        },
+      },
+    });
+
+    // cut the result based on given pageSize and page number
+    const start = queryTaskInput.page * queryTaskInput.pageSize;
+    const end = start + queryTaskInput.pageSize;
+
+    const result = new QueryTasksResult();
+    result.tasks = tasks.slice(start, end);
+    result.hasMore = end < tasks.length;
+
+    return result;
+  }
 
   findOne(taskId: string) {
     return this.taskRepository.findOneBy({ id: taskId });
@@ -152,5 +198,14 @@ export class TaskService {
     });
 
     return task.assignees;
+  }
+
+  async getLabels(taskid: string): Promise<Label[]> {
+    const task = await this.taskRepository.findOne({
+      relations: ['labels'],
+      where: { id: taskid },
+    });
+
+    return task.labels;
   }
 }

@@ -110,6 +110,8 @@ const groupQuery = graphql(`
     group(id: $id) {
       name
       users {
+        firstName
+        lastName
         userId
         username
         email

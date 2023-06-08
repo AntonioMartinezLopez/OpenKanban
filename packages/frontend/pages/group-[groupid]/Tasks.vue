@@ -32,8 +32,9 @@
     <div class="grid h-full w-full grid-cols-3 gap-4 pt-4">
       <!-- OPEN TASKS -->
       <div
-        class="col-span-3 rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
+        class="col-span-3 flex flex-col rounded-md border border-gray-500 shadow-md shadow-gray-700/90 md:col-span-1"
       >
+        <!-- HEADER -->
         <div
           class="flex h-12 w-full flex-row items-center justify-end gap-2 rounded-t-md border-b border-gray-500 bg-slate-800 p-2"
         >
@@ -76,6 +77,15 @@
 
             <span>36</span>
           </div>
+        </div>
+        <div
+          class="flex h-full flex-col gap-3 overflow-y-auto bg-transparent pl-3 pr-3 pt-3"
+        >
+          <TaskItemCard
+            v-for="(task, index) in loadedTasks['OPEN']"
+            :key="`Task-${index}`"
+            :task="task"
+          ></TaskItemCard>
         </div>
       </div>
       <!-- SELECTED TASKS -->
@@ -180,9 +190,63 @@
 
 <script setup lang="ts">
 // definePageMeta({ middleware: "auth" });
+
+import { graphql } from "~~/gql/gql";
+import { LoadedTasks } from "~~/types/types";
+
 // const routeParams = useRoute().params;
 const route = useRoute();
 const groupRoute = computed(() => {
   return route.params.groupid ? (route.params.groupid as string) : "";
 });
+
+const loadedTasks = {} as Record<string, LoadedTasks[] | undefined>;
+// -----------------FETCH DATA----------------------------//
+for (const x of ["OPEN", "SELECTED", "CLOSED"]) {
+  const taskQuery = graphql(`
+    query loadTasksfromBoard(
+      $groupId: String!
+      $boardColumnName: String!
+      $page: Int!
+      $pageSize: Int!
+    ) {
+      loadTasksfromBoard(
+        queryTasksInput: {
+          groupId: $groupId
+          boardColumnName: $boardColumnName
+          page: $page
+          pageSize: $pageSize
+        }
+      ) {
+        hasMore
+        tasks {
+          id
+          name
+          description
+          weight
+          assignees {
+            firstName
+            lastName
+            username
+            userId
+            email
+          }
+          labels {
+            name
+            color
+            id
+          }
+        }
+      }
+    }
+  `);
+  const queryData = await sendQuery(taskQuery, {
+    groupId: useRoute().params.groupid,
+    boardColumnName: x,
+    page: 0,
+    pageSize: 10,
+  });
+
+  loadedTasks[x] = queryData.value?.loadTasksfromBoard.tasks;
+}
 </script>

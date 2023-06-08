@@ -24,8 +24,7 @@ export class BoardcolumnService {
   async create(
     createBoardcolumnInput: CreateBoardcolumnInput,
   ): Promise<Boardcolumn> {
-    const newBoardColumn = new Boardcolumn();
-    newBoardColumn.name = createBoardcolumnInput.name;
+    const newBoardColumn = new Boardcolumn(createBoardcolumnInput.name, true);
     newBoardColumn.maxWeight = createBoardcolumnInput.maxWeight;
 
     const board = await this.boardService.findOne(
@@ -45,6 +44,14 @@ export class BoardcolumnService {
       throw new NotFoundException('Unknown Board Column Id');
     }
     return boardCol;
+  }
+
+  async findStartingColumn(boardId: string): Promise<Boardcolumn> {
+    const board = await this.boardService.findOne(boardId);
+
+    return board.columns.find((column) => {
+      return column.name === 'OPEN';
+    });
   }
 
   async update(

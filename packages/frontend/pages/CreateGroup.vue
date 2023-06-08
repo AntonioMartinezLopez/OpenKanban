@@ -101,6 +101,8 @@ const groupNames = groupData.value
 const queryUsers = graphql(`
   query users {
     users {
+      firstName
+      lastName
       username
       userId
       email
@@ -139,6 +141,7 @@ const submitInput = async () => {
       $description: String!
       $userId: String!
       $users: [String!]!
+      $boardName: String!
     ) {
       createGroup(
         createGroupInput: {
@@ -146,6 +149,7 @@ const submitInput = async () => {
           description: $description
           userId: $userId
           users: $users
+          boardName: $boardName
         }
       ) {
         id
@@ -157,6 +161,7 @@ const submitInput = async () => {
     description: descriptionInput.value,
     userId: userStore.userId,
     users: selectedMembers.value.map((member) => member.userId),
+    boardName: groupNameInput.value,
   });
 
   // reload user data
